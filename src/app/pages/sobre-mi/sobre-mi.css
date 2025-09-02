@@ -1,0 +1,41 @@
+.profile-img {
+  width: 200px;
+  height: 200px;
+  object-fit: cover;
+  border: 4px solid var(--primary-color);
+  box-shadow: 0 10px 30px rgba(111, 66, 193, 0.3);
+}
+
+.stat-card {
+  padding: 20px;
+  border-radius: 10px;
+  background: rgba(111, 66, 193, 0.1);
+  margin-bottom: 20px;
+  transition: transform 0.3s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-5px);
+}
+
+.card {
+  border: none;
+  border-radius: 15px;
+  background: rgba(33, 37, 41, 0.95);
+  backdrop-filter: blur(10px);
+}
+
+.badge {
+  font-size: 0.9rem;
+}
+
+.btn-outline-primary {
+  border-color: var(--primary-color);
+  color: var(--primary-color);
+}
+
+.btn-outline-primary:hover {
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
+}
+

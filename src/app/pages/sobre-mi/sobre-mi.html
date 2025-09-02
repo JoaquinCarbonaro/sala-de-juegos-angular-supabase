@@ -1,1 +1,144 @@
-<p>sobre-mi works!</p>
+<!-- src/app/pages/sobre-mi/sobre-mi.html -->
+<div class="container mt-5 pt-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <!-- Loading State -->
+      <div *ngIf="loading" class="text-center">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Cargando...</span>
+        </div>
+        <p class="mt-3">Cargando información desde GitHub...</p>
+      </div>
+
+      <!-- Error State -->
+      <div *ngIf="error && !loading" class="alert alert-warning text-center">
+        <i class="bi bi-exclamation-triangle me-2"></i>
+        No se pudo cargar la información de GitHub
+      </div>
+
+      <!-- Content -->
+      <div *ngIf="!loading && !error" class="card shadow-lg">
+        <div class="card-body p-5">
+          <!-- Header -->
+          <div class="row align-items-center mb-4">
+            <div class="col-md-4 text-center">
+              <img 
+                [src]="githubData?.avatar_url" 
+                alt="Joaquín Carbonaro"
+                class="rounded-circle img-fluid profile-img mb-3">
+            </div>
+            <div class="col-md-8">
+              <h1 class="text-primary mb-2">
+                {{ githubData?.name}}
+              </h1>
+              <p class="lead text-muted mb-3">
+                {{ githubData?.bio}}
+              </p>
+              <div class="d-flex flex-wrap gap-2">
+                <a 
+                  [href]="githubData?.html_url" 
+                  target="_blank" 
+                  class="btn btn-outline-primary btn-sm"
+                  (click)="$event.stopPropagation()">
+                  <i class="bi bi-github me-2"></i>
+                  GitHub
+                </a>
+                <span *ngIf="githubData?.location" class="badge bg-secondary">
+                  <i class="bi bi-geo-alt me-1"></i>
+                  {{ githubData?.location }}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Stats -->
+          <div class="row text-center mb-4" *ngIf="githubData">
+            <div class="col-md-4">
+              <div class="stat-card">
+                <i class="bi bi-code-slash display-6 text-primary"></i>
+                <h3 class="mt-2 lead text-muted mb-3">{{ githubData.public_repos }}</h3>
+                <p class="text-muted">Repositorios</p>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="stat-card">
+                <i class="bi bi-people display-6 text-primary"></i>
+                <h3 class="mt-2 lead text-muted mb-3">{{ githubData.followers }}</h3>
+                <p class="text-muted">Seguidores</p>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="stat-card">
+                <i class="bi bi-heart display-6 text-primary"></i>
+                <h3 class="mt-2 lead text-muted mb-3">{{ githubData.following }}</h3>
+                <p class="text-muted">Siguiendo</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- About -->
+          <div class="row">
+            <div class="col-12">
+              <h3 class="text-primary mb-3">
+                <i class="bi bi-person-circle me-2"></i>
+                Sobre Mí
+              </h3>
+              <p class="mb-3" class="lead text-muted mb-3">
+                Soy estudiante de la Tecnicatura en Sistemas en la UTN Facultad Regional Avellaneda, 
+                apasionado por el desarrollo de software y las nuevas tecnologías.
+              </p>
+              <p class="mb-3" class="lead text-muted mb-3">
+                Este proyecto forma parte de la materia Programación 4, donde aplicamos 
+                conocimientos de Angular, TypeScript, y desarrollo full-stack para crear 
+                una sala de juegos interactiva.
+              </p>
+              
+              <h4 class="text-primary mt-4 mb-3">Tecnologías Utilizadas</h4>
+              <div class="row">
+                <div class="col-md-6">
+                  <ul class="list-unstyled">
+                    <li class="mb-2 lead text-muted mb-3">
+                      <i class="bi bi-check-circle text-success me-2"></i>
+                      Angular
+                    </li>
+                    <li class="mb-2 lead text-muted mb-3">
+                      <i class="bi bi-check-circle text-success me-2"></i>
+                      TypeScript
+                    </li>
+                    <li class="mb-2 lead text-muted mb-3">
+                      <i class="bi bi-check-circle text-success me-2"></i>
+                      Bootstrap
+                    </li>
+                  </ul>
+                </div>
+                <div class="col-md-6 lead text-muted mb-3">
+                  <ul class="list-unstyled">
+                    <li class="mb-2">
+                      <i class="bi bi-check-circle text-success me-2"></i>
+                      Supabase
+                    </li>
+                    <li class="mb-2 lead text-muted mb-3">
+                      <i class="bi bi-check-circle text-success me-2"></i>
+                      GitHub API
+                    </li>
+                    <li class="mb-2 lead text-muted mb-3">
+                      <i class="bi bi-check-circle text-success me-2"></i>
+                      Diseño Responsivo
+                    </li>
+                  </ul>
+                </div>
+              </div>
+
+              <div class="text-center mt-4">
+                <p class="text-muted" *ngIf="githubData?.created_at">
+                  <i class="bi bi-calendar me-2"></i>
+                  Miembro de GitHub desde {{ githubData?.created_at | date:'MMMM yyyy' }}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div> 
+    </div>
+  </div>
+</div>

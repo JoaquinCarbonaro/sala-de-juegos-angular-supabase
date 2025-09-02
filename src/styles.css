@@ -1,4 +1,3 @@
-/* Removed Bootstrap CSS imports and replaced with ng-bootstrap styling */
 /* Tema violeta y negro */
 :root {
   --primary-color: #6f42c1;
@@ -42,3 +41,9 @@ body {
 .border-primary {
   border-color: var(--primary-color) !important;
 }
+
+/* Corrige textos que se ven apagados en fondo oscuro */
+.text-muted {
+  color: #e0e0e0 !important;  /* gris claro en lugar de gris oscuro */
+}
+
