@@ -1,3 +1,4 @@
+/*imagen de perfil con borde y sombra*/
 .profile-img {
   width: 200px;
   height: 200px;
@@ -6,6 +7,7 @@
   box-shadow: 0 10px 30px rgba(111, 66, 193, 0.3);
 }
 
+/*tarjeta de estadistica con efecto hover*/
 .stat-card {
   padding: 20px;
   border-radius: 10px;
@@ -14,10 +16,12 @@
   transition: transform 0.3s ease;
 }
 
+/*levanta un poco al pasar el mouse*/
 .stat-card:hover {
   transform: translateY(-5px);
 }
 
+/*tarjeta principal con blur*/
 .card {
   border: none;
   border-radius: 15px;
@@ -25,17 +29,33 @@
   backdrop-filter: blur(10px);
 }
 
+/*tamaño del badge de ubicacion*/
 .badge {
   font-size: 0.9rem;
 }
 
+/*boton outline con color de marca*/
 .btn-outline-primary {
   border-color: var(--primary-color);
   color: var(--primary-color);
 }
 
+/*hover del boton outline*/
 .btn-outline-primary:hover {
   background-color: var(--primary-color);
   border-color: var(--primary-color);
 }
 
+/*responsive ajustes opcionales en pantallas chicas*/
+@media (max-width: 767.98px) {
+  /*achico imagen para que no ocupe todo el ancho*/
+  .profile-img {
+    width: 160px;
+    height: 160px;
+  }
+
+  /*agrego separacion vertical entre stats*/
+  .stat-card {
+    margin-bottom: 16px;
+  }
+}
