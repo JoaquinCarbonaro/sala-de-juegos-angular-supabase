@@ -1,50 +1,51 @@
-import type { Routes } from "@angular/router"
+import type { Routes } from "@angular/router";
+import { estaLogueadoGuard } from "./guards/esta-logueado-guard";
+import { estaLogueadoChildGuard } from "./guards/esta-logueado-child-guard";
+import { noEstaLogueadoGuard } from "./guards/no-esta-logueado-guard";
 
 export const routes: Routes = [
 
   //ruta por defecto
   { path: "", redirectTo: "/bienvenida", pathMatch: "full" },
 
-  //ruta bienvenida
+  //publicas
   {
     path: "bienvenida",
     loadComponent: () => import("./pages/bienvenida/bienvenida").then((m) => m.Bienvenida),
   },
-
-  //ruta login
-  {
-    path: "login",
-    loadComponent: () => import("./pages/login/login").then((m) => m.Login),
-  },
-
-  //ruta registro
-  {
-    path: "registro",
-    loadComponent: () => import("./pages/registro/registro").then((m) => m.Registro),
-  },
-
-  //ruta sobre mi
   {
     path: "sobre-mi",
     loadComponent: () => import("./pages/sobre-mi/sobre-mi").then((m) => m.SobreMi),
   },
 
-  //ruta chat
+  //protegidas (requieren NO sesion)
+  {
+    path: "login",
+    loadComponent: () => import("./pages/login/login").then((m) => m.Login),
+    canActivate: [noEstaLogueadoGuard], //solo NO logueados
+  },
+  {
+    path: "registro",
+    loadComponent: () => import("./pages/registro/registro").then((m) => m.Registro),
+    canActivate: [noEstaLogueadoGuard], //solo NO logueados
+  },
+
+  //protegidas (requieren sesion)
   {
     path: "chat",
     loadComponent: () => import("./pages/chat/chat").then((m) => m.Chat),
+    canActivate: [estaLogueadoGuard], //solo logueados
   },
-
-  //ruta resultados
   {
     path: "resultados",
     loadComponent: () => import("./pages/resultados/resultados").then((m) => m.Resultados),
+    canActivate: [estaLogueadoGuard], //solo logueados
   },
-
-  //ruta juegos con rutas hijas
   {
     path: "juegos",
     loadComponent: () => import("./pages/juegos/juegos").then((m) => m.Juegos),
+    canActivate: [estaLogueadoGuard],           //solo logueados
+    canActivateChild: [estaLogueadoChildGuard], //protege TODAS las hijas -> solo logueados
     children: [
       {
         path: "ahorcado",
@@ -70,4 +71,4 @@ export const routes: Routes = [
     path: "**",
     loadComponent: () => import("./pages/error/error").then((m) => m.Error),
   },
-]
+];
