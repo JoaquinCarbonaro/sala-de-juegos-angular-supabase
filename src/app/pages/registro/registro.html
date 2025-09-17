@@ -23,13 +23,38 @@
                 <label for="nombre" class="form-label">
                   <i class="bi bi-person me-2"></i>Nombre
                 </label>
-                <input type="text" class="form-control" id="nombre" [(ngModel)]="usuario.nombre" name="nombre" required
-                  #nombreField="ngModel" placeholder="Tu nombre">
+
+                <input
+                  type="text"
+                  class="form-control"
+                  id="nombre"
+                  name="nombre"
+                  [(ngModel)]="usuario.nombre"
+                  required
+                  minlength="5"
+                  maxlength="25"
+                  pattern="^[A-Za-zÁÉÍÓÚáéíóúÑñ ]+$"
+                  #nombreField="ngModel"
+                  placeholder="Ingresa tu nombre"
+                  [class.is-invalid]="nombreField.touched && nombreField.invalid"
+                  [class.is-valid]="nombreField.touched && nombreField.valid"
+                >
 
                 <!--error nombre-->
                 @if (nombreField.invalid && nombreField.touched) {
                 <div class="text-danger small">
-                  El nombre es obligatorio
+                  @if (nombreField.errors?.['required']) {
+                    <div>El nombre es obligatorio</div>
+                  }
+                  @if (nombreField.errors?.['minlength']) {
+                    <div>Mínimo 5 caracteres</div>
+                  }
+                  @if (nombreField.errors?.['maxlength']) {
+                    <div>Máximo 25 caracteres</div>
+                  }
+                  @if (nombreField.errors?.['pattern']) {
+                    <div>Solo letras y espacios</div>
+                  }
                 </div>
                 }
               </div>
@@ -39,13 +64,38 @@
                 <label for="apellido" class="form-label">
                   <i class="bi bi-person me-2"></i>Apellido
                 </label>
-                <input type="text" class="form-control" id="apellido" [(ngModel)]="usuario.apellido" name="apellido"
-                  required #apellidoField="ngModel" placeholder="Tu apellido">
+                
+                <input
+                  type="text"
+                  class="form-control"
+                  id="apellido"
+                  name="apellido"
+                  [(ngModel)]="usuario.apellido"
+                  required
+                  minlength="5"
+                  maxlength="25"
+                  pattern="^[A-Za-zÁÉÍÓÚáéíóúÑñ ]+$"
+                  #apellidoField="ngModel"
+                  placeholder="Ingresa tu apellido"
+                  [class.is-invalid]="apellidoField.touched && apellidoField.invalid"
+                  [class.is-valid]="apellidoField.touched && apellidoField.valid"
+                >
 
                 <!--error apellido-->
                 @if (apellidoField.invalid && apellidoField.touched) {
                 <div class="text-danger small">
-                  El apellido es obligatorio
+                  @if (apellidoField.errors?.['required']) {
+                    <div>El apellido es obligatorio</div>
+                  }
+                  @if (apellidoField.errors?.['minlength']) {
+                    <div>Mínimo 5 caracteres</div>
+                  }
+                  @if (apellidoField.errors?.['maxlength']) {
+                    <div>Máximo 25 caracteres</div>
+                  }
+                  @if (apellidoField.errors?.['pattern']) {
+                    <div>Solo letras y espacios</div>
+                  }
                 </div>
                 }
               </div>
@@ -57,13 +107,40 @@
                 <i class="bi bi-calendar me-2"></i>
                 Edad
               </label>
-              <input type="number" class="form-control" id="edad" [(ngModel)]="usuario.edad" name="edad" required
-                min="1" max="99" #edadField="ngModel" placeholder="tu edad">
+              <input
+                type="number"
+                class="form-control"
+                id="edad"
+                name="edad"
+                [(ngModel)]="usuario.edad"
+                required
+                min="1"
+                max="99"
+                step="1"
+                inputmode="numeric"
+                pattern="^[0-9]+$"
+                #edadField="ngModel"
+                placeholder="Ingresa tu edad"
+                [class.is-invalid]="edadField.touched && edadField.invalid"
+                [class.is-valid]="edadField.touched && edadField.valid"
+                [attr.aria-invalid]="edadField.invalid ? true : null"
+              >
 
               <!--error edad-->
               @if (edadField.invalid && edadField.touched) {
               <div class="text-danger small">
-                Debes ingresar una edad válida
+                @if (edadField.errors?.['required']) {
+                  <div>La edad es obligatoria</div>
+                }
+                @if (edadField.errors?.['min']) {
+                  <div>La edad mínima permitida es 1</div>
+                }
+                @if (edadField.errors?.['max']) {
+                  <div>La edad máxima permitida es 99</div>
+                }
+                @if (edadField.errors?.['pattern']) {
+                  <div>La edad debe ser un número entero</div>
+                }
               </div>
               }
             </div>
@@ -82,7 +159,7 @@
                 name="email"
                 required
                 #emailField="ngModel"
-                placeholder="tu@email.com"
+                placeholder=" tu@email.com"
                 [class.is-invalid]="emailField.touched && emailField.invalid"
                 [class.is-valid]="emailField.touched && emailField.valid">
 
