@@ -6,7 +6,6 @@
       <img src="/logo.png" alt="Play4ever" height="50" class="d-inline-block align-text-top" />
     </a>
 
-
     <!--boton hamburguesa para abrir menu en celular-->
     <button class="navbar-toggler" type="button" (click)="toggleMenu()" [attr.aria-expanded]="!isMenuCollapsed">
       <!--responsive: este boton solo aparece cuando la barra esta colapsada-->
@@ -36,36 +35,64 @@
         </li>
 
         <!--autenticacion-->
-        <!--si hay usuario logueado, muestra nombre y boton salir-->
-        @if (usuario$ | async; as user) {
-        <li class="nav-item d-flex align-items-center">
-          <!--nombre de usuario-->
-          <span class="user-chip">
-            <i class="bi bi-person me-1"></i>
-            {{ user?.nombre || user?.email }}
-          </span>
-          <!--cerrar sesion-->
-          <button class="btn btn-outline-light btn-logout ms-2" (click)="logout()" aria-label="Cerrar sesión">
-            <i class="bi bi-box-arrow-right"></i>
-          </button>
-        </li>
-        } @else {
-        <!--si no hay usuario logeado, muestra links de login y registro-->
-        <!--login-->
-        <li class="nav-item">
-          <a class="nav-link" routerLink="/login" routerLinkActive="active" (click)="closeMenu()">
-            <i class="bi bi-box-arrow-in-right me-1"></i>
-            Ingresar
-          </a>
-        </li>
-        <!--registro-->
-        <li class="nav-item">
-          <a class="nav-link" routerLink="/registro" routerLinkActive="active" (click)="closeMenu()">
-            <i class="bi bi-person-plus me-1"></i>
-            Registrarse
-          </a>
-        </li>
+        <!--si hay usuario logueado-->
+        @if (usuario$ | async; as user) { 
+
+          <!--juegos - solo visible cuando esta logueado-->
+          <li class="nav-item">
+            <a class="nav-link" routerLink="/juegos" routerLinkActive="active" (click)="closeMenu()">
+              <i class="bi bi-controller me-1"></i>
+              Juegos
+            </a>
+          </li>
+          <!--resultados - solo visible cuando esta logueado-->
+          <li class="nav-item">
+            <a class="nav-link" routerLink="/resultados" routerLinkActive="active" (click)="closeMenu()">
+              <i class="bi bi-trophy me-1"></i>
+              Resultados
+            </a>
+          </li>
+          <!--sala de chat - solo visible cuando esta logueado-->
+          <li class="nav-item">
+            <a class="nav-link" routerLink="/chat" routerLinkActive="active" (click)="closeMenu()">
+              <i class="bi bi-chat-dots me-1"></i>
+              Sala de chat
+            </a>
+          </li>
+
+          <!--muestra nombre-->
+          <li class="nav-item d-flex align-items-center">
+            <!--nombre de usuario-->
+            <span class="user-chip">
+              <i class="bi bi-person me-1"></i>
+              {{ user?.nombre || user?.email }}
+            </span>
+
+            <!--cerrar sesion-->
+            <button class="btn btn-outline-light btn-logout ms-2" (click)="logout()" aria-label="Cerrar sesión">
+              <i class="bi bi-box-arrow-right"></i>
+            </button>
+          </li>
+
+        } @else { <!--si no hay usuario logeado-->
+          
+          <!--login-->
+          <li class="nav-item">
+            <a class="nav-link" routerLink="/login" routerLinkActive="active" (click)="closeMenu()">
+              <i class="bi bi-box-arrow-in-right me-1"></i>
+              Ingresar
+            </a>
+          </li>
+          
+          <!--registro-->
+          <li class="nav-item">
+            <a class="nav-link" routerLink="/registro" routerLinkActive="active" (click)="closeMenu()">
+              <i class="bi bi-person-plus me-1"></i>
+              Registrarse
+            </a>
+          </li>
         }
+
       </ul>
     </div>
   </div>

@@ -12,20 +12,20 @@ import { Usuario } from '../../classes/usuario'
   styleUrls: ['./bienvenida.css'],
 })
 export class Bienvenida {
-  //lista de juegos
+  //lista de juegos con nombre descripcion icono, estado y sprint
   juegos = [
     {
       nombre: 'Ahorcado',
       descripcion: 'Adivina la palabra oculta antes de que se complete el dibujo',
       icono: 'bi-alphabet',
-      disponible: false,
+      disponible: true,
       sprint: 3,
     },
     {
       nombre: 'Mayor o Menor',
       descripcion: 'Juego de cartas donde debes adivinar si la siguiente carta es mayor o menor',
       icono: 'bi-suit-spade',
-      disponible: false,
+      disponible: true,
       sprint: 3,
     },
     {
