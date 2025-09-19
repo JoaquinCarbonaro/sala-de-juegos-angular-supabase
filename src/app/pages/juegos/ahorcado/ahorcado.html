@@ -137,38 +137,43 @@
     </div>
 
   } @else if (gameStatus() === 'sessionOutOfLives') {
-    <!--modal sin vidas-->
-    <div class="hangman__modal">
-      <div class="hangman__modal-content hangman__modal-content--lost">
-        <div class="hangman__modal-icon">💀</div>
-        <h2 class="hangman__modal-title">Fin de la sesion</h2>
-        <p class="hangman__modal-description">
-          Te quedaste sin vidas adivinaste {{ completedWords() }} palabra(s)
-        </p>
-        <div class="hangman__modal-actions">
-          <button class="hangman__reload hangman__modal-button" (click)="startNewGame()">
-            Iniciar nueva partida
-          </button>
-        </div>
+  <!--modal sin vidas-->
+  <div class="hangman__modal">
+    <div class="hangman__modal-content hangman__modal-content--lost">
+      <div class="hangman__modal-icon">💀</div>
+      <h2 class="hangman__modal-title">Fin de la sesión</h2>
+      <p class="hangman__modal-description">
+        Te quedaste sin vidas. Adivinaste {{ completedWords() }} palabra(s).
+      </p>
+      <!--muestra la solucion-->
+      <p class="hangman__modal-description">La palabra era: <strong>{{ spanishWord() }}</strong></p>
+      <div class="hangman__modal-actions">
+        <button class="hangman__reload hangman__modal-button" (click)="startNewGame()">
+          Iniciar nueva partida
+        </button>
       </div>
     </div>
+  </div>
 
   } @else if (gameStatus() === 'sessionTimeUp') {
-    <!--modal tiempo agotado-->
-    <div class="hangman__modal">
-      <div class="hangman__modal-content hangman__modal-content--lost">
-        <div class="hangman__modal-icon">⏰</div>
-        <h2 class="hangman__modal-title">Tiempo agotado</h2>
-        <p class="hangman__modal-description">
-          Se termino el tiempo adivinaste {{ completedWords() }} palabra(s)
-        </p>
-        <div class="hangman__modal-actions">
-          <button class="hangman__reload hangman__modal-button" (click)="startNewGame()">
-            Jugar otra vez
-          </button>
-        </div>
+  <!--modal tiempo agotado-->
+  <div class="hangman__modal">
+    <div class="hangman__modal-content hangman__modal-content--lost">
+      <div class="hangman__modal-icon">⏰</div>
+      <h2 class="hangman__modal-title">Tiempo agotado</h2>
+      <p class="hangman__modal-description">
+        Se terminó el tiempo disponible. Adivinaste {{ completedWords() }} palabra(s).
+      </p>
+      <!--muestra la solucion-->
+      <p class="hangman__modal-description">La palabra era: <strong>{{ spanishWord() }}</strong></p>
+      <div class="hangman__modal-actions">
+        <button class="hangman__reload hangman__modal-button" (click)="startNewGame()">
+          Iniciar nueva partida
+        </button>
       </div>
     </div>
-  }
+  </div>
+}
+
 
 </section>
