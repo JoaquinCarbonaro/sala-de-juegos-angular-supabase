@@ -1,1 +1,174 @@
-<p>ahorcado works!</p>
+<section class="hangman">
+
+  <!--encabezado y controles-->
+  <header class="hangman__header">
+    <h1>Juego del Ahorcado</h1>
+    <p>
+      Selecciona una categoria y adivina la palabra en español antes de quedarte sin vidas
+    </p>
+
+    <!--controles principales-->
+    <div class="hangman__controls">
+
+      <!--label del select-->
+      <label class="hangman__label" for="category-select">Categoria</label>
+      <!--selector de categorias-->
+      <select
+        id="category-select"
+        class="hangman__select"
+        (change)="onCategoryChange($event)"
+        [disabled]="loading() || categories().length === 0"
+      >
+        @for (option of categories(); track option) {
+          <option [value]="option" [selected]="option === selectedCategory()">
+            {{ categoryLabels[option] || option }}
+          </option>
+        }
+      </select>
+      <!--boton nueva palabra-->
+      <button
+        class="hangman__reload"
+        (click)="startNewGame()"
+        [disabled]="loading() || categories().length === 0"
+      >
+        @if (loading()) {
+          <span>Cargando...</span>
+        } @else {
+          <span>Nueva palabra</span>
+        }
+      </button>
+    </div>
+  </header>
+
+  <!--mensaje de error-->
+  @if (loadError()) {
+    <div class="hangman__error">
+      <p>{{ loadError() }}</p>
+      <button class="hangman__reload" (click)="retryLoad()">Reintentar</button>
+    </div>
+  }
+
+  <!--zona principal del juego-->
+  @if (!loadError()) {
+    <div class="hangman__body">
+
+      <!--panel reutilizable de datos (match-panel)-->
+      <app-match-panel
+        [time]="remainingTime()"
+        [totalTime]="maxTimeSeconds"
+        [remainingLives]="remainingAttempts()"
+        [totalLives]="maxFails"
+        [hits]="completedWords()"
+      ></app-match-panel>
+
+      <!--bloque con dibujo y palabra-->
+      <div class="hangman__play">
+        <!--dibujo del ahorcado-->
+        <div class="hangman__figure">
+          <img [src]="hangmanImage()" alt="Dibujo del ahorcado" />
+        </div>
+        
+        <!--contenedor de la palabra-->
+        <div class="hangman__word">
+          <!--linea que muestra la palabra enmascarada-->
+          <p class="word-line">
+            <!--recorro cada palabra enmascarada-->
+            @for (w of maskedWords(); track $index) {
+              <!--palabra enmascarada completa-->
+              <span class="word-pill">{{ w }}</span>
+              <!--gap visual entre palabras-->
+              @if ($index < maskedWords().length - 1) { <span class="word-gap"></span> }
+            }
+          </p>
+        </div>
+        
+    </div>
+
+      <!--teclado de letras-->
+      <div class="hangman__keyboard">
+        @for (row of keyboardRows; track $index) {
+          <div class="keyboard-row">
+            @for (letter of row; track letter) {
+              <!--boton de letra-->
+              <button
+                class="keyboard-key"
+                (click)="onLetterSelected(letter)"
+                [disabled]="
+                  loading() ||
+                  gameStatus() !== 'playing' ||
+                  usedLetters().includes(letter)
+                "
+              >
+                {{ letter }}
+              </button>
+            }
+          </div>
+        }
+      </div>
+
+      <!--datos extra de categoria y pista-->
+      <section class="hangman__info">
+        <p>
+          <strong>Categoria:</strong>
+          {{ categoryLabels[category()] || category() || 'Sin categoria' }}
+          @if (hint()) {
+            <p><strong>Pista:</strong> {{ hint() }}</p>
+          }
+        </p>
+      </section>
+    </div>
+  }
+
+  <!--modal cuando se gana una ronda-->
+  @if (gameStatus() === 'roundWon') {
+    <div class="hangman__modal">
+      <div class="hangman__modal-content hangman__modal-content--won">
+        <div class="hangman__modal-icon">🎉</div>
+        <h2 class="hangman__modal-title">Palabra adivinada</h2>
+        <p class="hangman__modal-description">
+          Llevas {{ completedWords() }} aciertos en esta sesion
+        </p>
+        <div class="hangman__modal-actions">
+          <button class="hangman__reload hangman__modal-button" (click)="startNewGame()">
+            Siguiente palabra
+          </button>
+        </div>
+      </div>
+    </div>
+
+  } @else if (gameStatus() === 'sessionOutOfLives') {
+    <!--modal sin vidas-->
+    <div class="hangman__modal">
+      <div class="hangman__modal-content hangman__modal-content--lost">
+        <div class="hangman__modal-icon">💀</div>
+        <h2 class="hangman__modal-title">Fin de la sesion</h2>
+        <p class="hangman__modal-description">
+          Te quedaste sin vidas adivinaste {{ completedWords() }} palabra(s)
+        </p>
+        <div class="hangman__modal-actions">
+          <button class="hangman__reload hangman__modal-button" (click)="startNewGame()">
+            Iniciar nueva partida
+          </button>
+        </div>
+      </div>
+    </div>
+
+  } @else if (gameStatus() === 'sessionTimeUp') {
+    <!--modal tiempo agotado-->
+    <div class="hangman__modal">
+      <div class="hangman__modal-content hangman__modal-content--lost">
+        <div class="hangman__modal-icon">⏰</div>
+        <h2 class="hangman__modal-title">Tiempo agotado</h2>
+        <p class="hangman__modal-description">
+          Se termino el tiempo adivinaste {{ completedWords() }} palabra(s)
+        </p>
+        <div class="hangman__modal-actions">
+          <button class="hangman__reload hangman__modal-button" (click)="startNewGame()">
+            Jugar otra vez
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+</section>

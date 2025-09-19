@@ -1,0 +1,288 @@
+/*contenedor principal*/
+.hangman {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/*encabezado del juego*/
+.hangman__header {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+/*boton de reinicio*/
+.hangman__reload {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 8px;
+  background-color: #3f51b5;
+  color: #ffffff;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 10px 20px rgba(63, 81, 181, 0.35);
+}
+
+/*estado deshabilitado del boton*/
+.hangman__reload:disabled {
+  background-color: #9da7d1;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/*hover del boton activo*/
+.hangman__reload:not(:disabled):hover {
+  transform: translateY(-2px);
+  background-color: #2f3fa0;
+  box-shadow: 0 14px 24px rgba(63, 81, 181, 0.45);
+}
+
+/*mensaje de error*/
+.hangman__error {
+  padding: 16px;
+  border-radius: 12px;
+  background-color: #ffe0e0;
+  color: #5c1d1d;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/*cuerpo del juego*/
+.hangman__body {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/*controles principales*/
+.hangman__controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+}
+
+/*label del select*/
+.hangman__label {
+  font-weight: 600;
+}
+
+/*select de categorias*/
+.hangman__select {
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 2px solid #3f51b5;
+  background-color: #ffffff;
+  font-weight: 600;
+  min-width: 160px;
+}
+
+/*bloque principal de juego*/
+.hangman__play {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  align-items: center;
+}
+
+/*contenedor del dibujo*/
+.hangman__figure {
+  background-color: #ffffff;
+  padding: 16px;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+/*imagen del ahorcado*/
+.hangman__figure img {
+  width: 240px;
+  height: auto;
+  object-fit: contain;
+}
+
+/*texto de la palabra*/
+.hangman__word {
+  padding: 24px;
+  border-radius: 12px;
+  background-color: #1a1a2e;
+  color: #ffffff;
+  font-size: 28px;
+  letter-spacing: 8px;
+  text-align: center;
+  font-weight: 700;
+  width: 100%;
+  max-width: 520px;
+}
+
+/*datos extra*/
+.hangman__info {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/*teclado completo*/
+.hangman__keyboard {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/*fila del teclado*/
+.keyboard-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+}
+
+/*tecla individual*/
+.keyboard-key {
+  width: 48px;
+  height: 48px;
+  border: none;
+  border-radius: 8px;
+  background-color: #e0e3ff;
+  color: #1a1a2e;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.2s ease, background-color 0.2s ease;
+}
+
+/*tecla deshabilitada*/
+.keyboard-key:disabled {
+  background-color: #bfc4e6;
+  color: #5f5f7a;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/*hover de la tecla*/
+.keyboard-key:not(:disabled):hover {
+  transform: translateY(-2px);
+  background-color: #c9ceff;
+}
+
+/*modal general*/
+.hangman__modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(10, 13, 35, 0.65);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 16px;
+  z-index: 30;
+  backdrop-filter: blur(4px);
+}
+
+/*contenido base del modal*/
+.hangman__modal-content {
+  padding: 32px 28px;
+  border-radius: 22px;
+  width: min(420px, 100%);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  color: #f5f7ff;
+  box-shadow: 0 22px 44px rgba(9, 12, 34, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+/*modal ganador*/
+.hangman__modal-content--won {
+  background: linear-gradient(155deg, #1b5e20, #4caf50);
+}
+
+/*modal perdedor*/
+.hangman__modal-content--lost {
+  background: linear-gradient(155deg, #6d1b1b, #e53935);
+}
+
+/*icono grande*/
+.hangman__modal-icon {
+  font-size: 2.4rem;
+}
+
+/*titulo modal*/
+.hangman__modal-title {
+  font-size: 2.2rem;
+  margin: 0;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/*descripcion*/
+.hangman__modal-description {
+  margin: 0;
+  font-size: 1.1rem;
+  line-height: 1.6;
+}
+
+/*contenedor botones*/
+.hangman__modal-actions {
+  display: flex;
+  justify-content: center;
+}
+
+/*boton dentro del modal*/
+.hangman__modal-button {
+  min-width: 180px;
+  font-size: 1rem;
+  box-shadow: 0 10px 18px rgba(0, 0, 0, 0.25);
+}
+
+/*linea que contiene todas las palabras*/
+.word-line{white-space: normal;}
+/*cada palabra no se corta y tiene espaciado entre letras*/
+.word-pill{white-space: nowrap; letter-spacing:8px;}
+/*espacio fijo entre palabras*/
+.word-gap{display:inline-block; width:16px;}
+
+/*responsive en pantallas chicas*/
+@media (max-width: 767px) {
+  /*achico padding*/
+  .hangman {
+    padding: 16px;
+  }
+  /*achico imagen*/
+  .hangman__figure img {
+    width: 200px;
+  }
+  /*achico texto palabra*/
+  .hangman__word {
+    font-size: 22px;
+    letter-spacing: 6px;
+  }
+  /*achico teclas*/
+  .keyboard-key {
+    width: 44px;
+    height: 44px;
+  }
+}
+
+/*responsive en pantallas grandes*/
+@media (min-width: 992px) {
+  /*centro header*/
+  .hangman__header {
+    align-items: center;
+    text-align: center;
+  }
+  /*responsive se expande desde 992px*/
+  .hangman__controls {
+    justify-content: center;
+  }
+}
