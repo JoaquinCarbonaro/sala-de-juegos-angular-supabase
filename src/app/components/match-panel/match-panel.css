@@ -1,0 +1,111 @@
+/*panel base (contenedor principal)*/
+.panel {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 20px;
+  padding: 20px;
+  border-radius: 20px;
+  background: linear-gradient(150deg, #1f225b, #3f51b5);
+  color: #f5f7ff;
+  box-shadow: 0 16px 32px rgba(15, 23, 42, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+}
+
+/*bloque individual del panel*/
+.panel__metric {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 18px;
+  border-radius: 16px;
+  background: rgba(15, 23, 42, 0.42);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.18);
+  backdrop-filter: blur(6px);
+}
+
+/*titulo de cada bloque centrado*/
+.panel__label {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: #cbd5ff;
+  text-align: center;
+}
+
+/*icono decorativo grande*/
+.panel__icon {
+  font-size: 1.6rem;
+  line-height: 1;
+}
+
+/*icono decorativo normal*/
+.panel__icon {
+  font-size: 1.4rem;
+  line-height: 1;
+}
+
+/*valor principal centrado para tiempo y aciertos*/
+.panel__value {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0;
+  text-align: center; 
+}
+
+/*vidas*/
+.panel__metric--lives .panel__value--lives {
+  display: flex;
+  justify-content: center; 
+  align-items: center;
+  padding: 10px 0;
+}
+
+/*imagen de corazones*/
+.panel__metric--lives .panel__value--lives img {
+  width: clamp(96px, 18vw, 180px); /*se adapta segun pantalla*/
+  height: auto;
+  filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.35));
+}
+
+/*alerta visual para texto*/
+.panel__value--alert {
+  color: #ffb4b4;
+  text-shadow: 0 0 6px rgba(255, 90, 90, 0.45);
+}
+
+/*barra contenedor de tiempo*/
+.panel__progress {
+  width: 100%;
+  height: 8px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.18);
+  overflow: hidden;
+}
+
+/*barra interna de tiempo*/
+.panel__progress-bar {
+  height: 100%;
+  background: linear-gradient(135deg, #4caf50, #81c784);
+  border-radius: inherit;
+  transition: width 0.3s ease;
+  box-shadow: 0 0 12px rgba(129, 199, 132, 0.65);
+}
+
+/*barra en modo alerta*/
+.panel__progress-bar--alert {
+  background: linear-gradient(135deg, #ef5350, #ff8a80);
+  box-shadow: 0 0 12px rgba(255, 138, 128, 0.65);
+}
+
+/*responsive en pantallas chicas*/
+@media (max-width: 575px) {
+  /*panel en columna unica*/
+  .panel { grid-template-columns: 1fr; }
+  /*valor un poco mas chico*/
+  .panel__value { font-size: 1.8rem; }
+}

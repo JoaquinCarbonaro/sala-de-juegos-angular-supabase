@@ -1,1 +1,53 @@
-<p>match-panel works!</p>
+<section class="panel">
+
+  <!--tiempo restante-->
+  <article class="panel__metric panel__metric--time">
+
+    <!--titulo-->
+    <div class="panel__label">
+      <span>Tiempo restante</span>
+    </div>
+
+    <!--valor de tiempo-->
+    <p class="panel__value" [class.panel__value--alert]="isTimeLow">{{ formattedTime }}</p>
+
+    @if (totalTime > 0) {
+      <!--barra de progreso contenedor-->
+      <div class="panel__progress">
+        <div
+          class="panel__progress-bar"
+          [class.panel__progress-bar--alert]="isTimeLow"
+          [style.width.%]="timeProgress"
+        ></div>
+      </div>
+    }
+  </article>
+
+  <!--vidas restantes-->
+  <article class="panel__metric panel__metric--lives">
+
+    <!--titulo-->
+    <div class="panel__label">
+      <span>Vidas restantes</span>
+    </div>
+
+    <!--valor de vidas-->
+    <div class="panel__value panel__value--lives" [class.panel__value--alert]="isLivesLow">
+      <!--imagen de vidas-->
+      <img [src]="livesImage" alt="Vidas restantes" />
+    </div>
+  </article>
+
+  <!--aciertos-->
+  <article class="panel__metric panel__metric--hits">
+
+    <!--titulo-->
+    <div class="panel__label">
+      <span>Aciertos</span>
+    </div>
+
+    <!--valor de aciertos-->
+    <p class="panel__value">{{ hits }}</p>
+  </article>
+  
+</section>
