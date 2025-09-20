@@ -1,8 +1,7 @@
 <div class="container mt-5 pt-5 hero-section">
-
-  <!-- outlet de rutas hijas; expongo la ref para saber si hay hijo activo -->
   <div class="row">
     <div class="col-12">
+      <!--cargan las rutas hijas-->
       <router-outlet #childOutlet="outlet"></router-outlet>
     </div>
   </div>
@@ -11,41 +10,50 @@
     <!--titulo principal-->
     <div class="row mb-5">
       <div class="col-12 text-center">
+        <!--titulo con icono-->
         <h1 class="hero-title fw-bold text-primary mb-2">
-          <i class="bi bi-controller me-2"></i>
-          Sala de Juegos
+          <i class="bi bi-controller me-2"></i> Sala de Juegos
         </h1>
-        <p class="lead text-light mb-4">
-          Elige tu juego favorito y comienza la diversión
-        </p>
+        <!--subtitulo-->
+        <p class="lead text-light mb-4">Elige tu juego favorito y comienza la diversión</p>
       </div>
     </div>
 
-    <!--seccion de juegos-->
     @if (usuario$ | async) {
+      <!--listado de juegos-->
       <div class="row mb-5">
         <div class="col-12">
-          <!--grilla de juegos-->
           <div class="row g-4">
             @for (juego of juegos; track $index) {
+              <!--columna para cada juego-->
               <div class="col-md-6 col-lg-3">
-                <!--card del juego-->
-                <div class="card h-100 game-card" [class.disabled]="!juego.disponible">
-                  <div class="card-body text-center">
-                    <i class="{{ juego.icono }} display-4 text-primary mb-3"></i>
-                    <h5 class="card-title"><span class="text-light">{{ juego.nombre }}</span></h5>
+                <!--tarjeta de juego-->
+                <div class="card h-100 game-card">
+                  <div class="card-body d-flex flex-column text-center">
+
+                    <!--imagen del juego-->
+                    <div class="game-thumb-wrap">
+                      <img class="game-thumb"
+                           [src]="juego.imagen"
+                           [alt]="'Logo de ' + juego.nombre"
+                           loading="lazy"
+                           decoding="async"
+                           (error)="onImgError($event)">
+                    </div>
+
+                    <!--titulo del juego-->
+                    <h5 class="card-title">
+                      <span class="text-light">{{ juego.nombre }}</span>
+                    </h5>
+
+                    <!--descripcion del juego-->
                     <p class="card-text text-muted">{{ juego.descripcion }}</p>
 
+                    <!--boton para jugar-->
                     <div class="mt-auto">
-                      @if (!juego.disponible) {
-                        <span class="badge bg-secondary">Sprint {{ juego.sprint }}</span>
-                      }
-                      @if (juego.disponible) {
-                        <button class="btn btn-primary" (click)="jugarJuego(juego.ruta)">
-                          Jugar
-                        </button>
-                      }
+                      <button class="btn btn-primary" (click)="jugarJuego(juego.ruta)">Jugar</button>
                     </div>
+
                   </div>
                 </div>
               </div>
