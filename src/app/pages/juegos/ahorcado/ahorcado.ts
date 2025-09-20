@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common'
 import { Component, OnDestroy, OnInit, computed, signal } from '@angular/core'
+import { RouterLink } from '@angular/router'
 import { HangmanApi } from '../../../services/hangman'
 import { Translation } from '../../../services/translation'
 import { Auth } from '../../../services/auth'
@@ -8,7 +9,7 @@ import { MatchPanel } from '../../../components/match-panel/match-panel'
 
 @Component({
   selector: 'app-ahorcado',
-  imports: [CommonModule, MatchPanel],
+  imports: [CommonModule, MatchPanel, RouterLink],
   templateUrl: './ahorcado.html',
   styleUrl: './ahorcado.css'
 })
@@ -24,7 +25,7 @@ export class Ahorcado implements OnInit, OnDestroy {
 
   //====================================================================
 
-  //teclado qwerty esp
+  //teclado en filas para la ui
   readonly keyboardRows = [
     ['Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P'],
     ['A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', 'Ñ'],
@@ -44,38 +45,41 @@ export class Ahorcado implements OnInit, OnDestroy {
 
   //====================================================================
 
+  //estado principal de carga y datos
   loading = signal(false) //estado de carga
-  categories = signal<string[]>([]) //lista de categorias
-  selectedCategory = signal('') //categoria elegida
-  loadError = signal<string | null>(null) //mensaje de error
+  categories = signal<string[]>([]) //lista de categorias disponibles
+  selectedCategory = signal('') //categoria elegida por el jugador
+  loadError = signal<string | null>(null) //mensaje de error si falla la carga
   englishWord = signal('') //palabra original en ingles
-  spanishWord = signal('') //palabra en español (en mayuscula)
-  normalizedLetters = signal<string[]>([]) //lista normalizada para comparar
-  targetLetters = signal<string[]>([]) //letras objetivo sin repetir
-  category = signal('') //categoria de la palabra
-  hint = signal('') //pista opcional
-  usedLetters = signal<string[]>([]) //historial de letras usadas
-  wrongAttempts = signal(0) //cantidad de errores
-  completedWords = signal(0) //palabras completas en la sesion
-  elapsedSeconds = signal(0) //tiempo transcurrido en seg
+  spanishWord = signal('') //palabra en espanol en mayuscula
+  normalizedLetters = signal<string[]>([]) //palabra normalizada letra por letra
+  targetLetters = signal<string[]>([]) //letras objetivo sin repetir para ganar
+  category = signal('') //categoria de la palabra actual
+  hint = signal('') //pista opcional traducida
+  usedLetters = signal<string[]>([]) //historial de letras seleccionadas
+  wrongAttempts = signal(0) //cantidad de errores de la ronda
+  completedWords = signal(0) //contador de palabras resueltas en la sesion
+  elapsedSeconds = signal(0) //tiempo transcurrido en segundos
+  lastSolvedWord = signal('') //ultima palabra resuelta para mostrar como feedback
 
   //estado global del juego
-  gameStatus = signal<'idle' | 'playing' | 'roundWon' | 'sessionOutOfLives' | 'sessionTimeUp'>('idle') 
-  //idle = juego esperando o recien cargado sin partida (se muestra pantalla en espera)
-  //playing = partida en curso, el jugador esta jugando
-  //roundWon = ronda completada, palabra adivinada (se muestra modal de victoria)
-  //sessionOutOfLives = partida terminada porque no quedan vidas (termina la sesion)
-  //sessionTimeUp = partida terminada porque se acabo el tiempo (termina la sesion)
+  gameStatus = signal<'idle' | 'playing' | 'sessionOutOfLives' | 'sessionTimeUp'>('idle')
+  //idle = sesion iniciada pero esperando que llegue una nueva palabra
+  //playing = partida en curso el jugador esta jugando
+  //sessionOutOfLives = sesion terminada porque no quedan vidas
+  //sessionTimeUp = sesion terminada porque se acabo el tiempo
 
+  hasSessionStarted = signal(false) //indica si el jugador ya inicio la sesion
+
+  //refs internas para timer y control de sesion
   private timerRef: any = null //referencia del timer
   private sessionStartTimestamp: number | null = null //inicio de sesion en ms
   private sessionRunning = false //bandera de sesion activa
+  private usedWordsSet = new Set<string>() //set de palabras ya usadas en la sesion
 
+  //limites del juego
   readonly maxFails = 6 //maximo de errores
   readonly maxTimeSeconds = 180 //tiempo limite en seg
-
-  //palabras usadas en la sesion
-  private usedWordsSet = new Set<string>()
 
   //====================================================================
 
@@ -97,71 +101,61 @@ export class Ahorcado implements OnInit, OnDestroy {
 
   //====================================================================
 
-  //imagen segun errores
+  //imagen segun cantidad de errores
   hangmanImage = computed(() => {
     //limito rango de errores
     const fails = this.wrongAttempts()
     const safeFails = Math.max(0, Math.min(this.maxFails, fails))
-    //devuelvo ruta de imagen
+    //ruta a imagen segun estado
     return `assets/images/ahorcado/${safeFails}-pos.jpg`
   })
 
   //====================================================================
 
-  //palabra enmascarada por palabras
+  //palabra enmascarada separada por palabras
   maskedWords = computed(() => {
-    const s = this.spanishWord() //tomo palabra traducida en esp
-    const n = this.normalizedLetters() //lista de letras normalizadas
-    const used = this.usedLetters().map(l => this.normalizeLetter(l)) //letras ya usadas normalizadas
-
-    //recorro cada caracter de la palabra
-    const chars = s.split('').map((ch,i)=>{
-
-      //veo si el caracter es letra objetivo
+    const s = this.spanishWord()
+    const n = this.normalizedLetters()
+    const used = this.usedLetters().map(l => this.normalizeLetter(l))
+    //si el caracter no es letra objetivo lo muestro tal cual
+    //si es letra objetivo lo muestro solo si ya fue usada
+    const chars = s.split('').map((ch, i) => {
       const t = this.targetLetters().includes(n[i] ?? '')
-
-      if(!t) return ch //si no es letra objetivo lo dejo igual
-
-      //si la letra ya fue usada la muestro, si no pongo guion bajo
+      if (!t) return ch
       return used.includes(n[i] ?? '') ? ch : '_'
     })
-    
-    //junto todo y divido por espacio para armar array de palabras
-    return chars.join('').split(' ') //array de palabras ya enmascaradas
+    //devuelvo array de palabras para pintar con espacios entre spans
+    return chars.join('').split(' ')
   })
 
   //====================================================================
 
-  //ciclo de vida init
+  //ciclo de vida inicio
   ngOnInit() {
-    //cargo categorias al iniciar
+    //cargo categorias al entrar
     void this.loadCategories()
   }
 
   //====================================================================
 
-  //ciclo de vida destroy
+  //ciclo de vida destruccion
   ngOnDestroy() {
-    //detengo timer y marco fin de sesion
+    //apago timer y marco sesion inactiva
     this.stopTimer()
     this.sessionRunning = false
   }
 
   //====================================================================
 
-  //carga inicial de categorias
+  //carga categorias desde api
   private async loadCategories() {
-    //pido categorias y seteo estado
     try {
       const categorias = await this.hangmanApi.fetchCategories()
       this.categories.set(categorias)
-      //si hay categorias elijo la primera y comienzo
       if (categorias.length > 0) {
-        this.selectedCategory.set(categorias[0])
-        await this.startNewGame()
+        this.selectedCategory.set(categorias[0]) //selecciono primera por defecto
       }
     } catch (error) {
-      //guardo mensaje simple de error
       console.log('no pude cargar categorias', error)
       this.loadError.set('No se pudieron cargar las categorias. Intenta mas tarde.')
     }
@@ -169,70 +163,79 @@ export class Ahorcado implements OnInit, OnDestroy {
 
   //====================================================================
 
-  //cambio de categoria desde el select
+  //evento de cambio de categoria
   onCategoryChange(event: Event) {
-    //actualizo categoria y reinicio
     const selectElement = event.target as HTMLSelectElement
     const value = selectElement.value
     this.selectedCategory.set(value)
-    void this.startNewGame()
+    //si ya habia sesion activo nueva palabra
+    if (this.hasSessionStarted()) {
+      void this.startNewGame()
+    }
   }
 
   //====================================================================
 
-  //reintento de carga
+  //reintenta cargar categorias o nueva palabra
   retryLoad() {
-    //si no hay categorias las vuelvo a pedir
     if (this.categories().length === 0) {
       void this.loadCategories()
       return
     }
-    //si hay categorias solo reinicio palabra
+    if (this.hasSessionStarted()) {
+      void this.startNewGame()
+    }
+  }
+
+  //====================================================================
+
+  //marca inicio de sesion y arranca primer juego
+  startSession() {
+    this.hasSessionStarted.set(true)
     void this.startNewGame()
   }
 
   //====================================================================
 
-  //inicia una nueva ronda o sesion
+  //inicia una nueva ronda con palabra nueva
   async startNewGame() {
-    //si no hay categoria informo y salgo
     if (!this.selectedCategory()) {
       this.loadError.set('Elige una categoria para empezar la partida.')
       return
     }
-    //verifico si arranca sesion nueva
+    this.hasSessionStarted.set(true)
+
+    //defino si arranca sesion desde cero
     const startingNewSession =
       !this.sessionRunning ||
       this.gameStatus() === 'sessionOutOfLives' ||
       this.gameStatus() === 'sessionTimeUp'
 
-    //marco loading y limpio estados de error
+    //preparo estado base
     this.loading.set(true)
     this.loadError.set(null)
     this.gameStatus.set('idle')
 
-    //si es sesion nueva reinicio contadores
+    //si empieza sesion reseteo todo
     if (startingNewSession) {
       this.resetSessionState()
     }
 
     try {
-      //traigo palabra filtrada por categoria intentando no repetir
       const category = this.selectedCategory()
 
-      //busco palabra que no se haya usado en esta sesion
-      var word: any = null
-      for (var i = 0; i < 5; i++) { //maximo 5 intentos
+      //busco palabra no repetida hasta 5 intentos
+      let word: any = null
+      for (let i = 0; i < 5; i++) {
         const candidate = await this.hangmanApi.fetchRandomWordByCategory(category)
         const key = (candidate.word ?? '').toUpperCase()
         if (!this.usedWordsSet.has(key)) {
-          //guardo como usada y la tomo
           this.usedWordsSet.add(key)
           word = candidate
           break
         }
       }
-      //si no encontre nueva en 5 intentos tomo la ultima aunque sea repetida
+      //si no encontre uso fallback y la marco como usada
       if (!word) {
         const fallback = await this.hangmanApi.fetchRandomWordByCategory(category)
         const key = (fallback.word ?? '').toUpperCase()
@@ -240,32 +243,33 @@ export class Ahorcado implements OnInit, OnDestroy {
         word = fallback
       }
 
-      //guardo palabra en ingles mayus
+      //seteo palabra e info base
       this.englishWord.set(word.word.toUpperCase())
-      //guardo categoria de respaldo
       this.category.set(word.category ?? category)
-      //reseteo pista mientras traduzco
+
+      //preparo pista en limpio
       const englishHint = (word.hint ?? '').trim()
       this.hint.set('')
+
       //traduzco palabra con fallback
-      var translated = ''
+      let translated = ''
       try {
         translated = await this.translation.translateToSpanish(word.word)
       } catch (error) {
         console.log('fallo la traduccion uso palabra original', error)
         translated = word.word
       }
-      //si viene vacio uso original
       if (!translated || translated.trim().length === 0) {
         translated = word.word
       }
-      //preparo palabra en esp para jugar
+
+      //armo palabra en espanol y estructuras auxiliares
       this.prepareSpanishWord(translated)
-      //limpio letras usadas
       this.usedLetters.set([])
-      //traduzco pista si existe con fallback
+
+      //si hay pista traduzco con fallback
       if (englishHint.length > 0) {
-        var translatedHint = englishHint
+        let translatedHint = englishHint
         try {
           translatedHint = await this.translation.translateToSpanish(englishHint)
         } catch (error) {
@@ -273,61 +277,57 @@ export class Ahorcado implements OnInit, OnDestroy {
         }
         this.hint.set(translatedHint)
       }
-      //muestro por consola para pruebas
-      console.log('palabra en esp para pruebas:', this.spanishWord())
-      //verifico que haya letras validas
+
+      console.log('palabra:', this.spanishWord())
+
+      //si no hay letras objetivo aviso error
       if (this.targetLetters().length === 0) {
         this.loadError.set('La palabra recibida no es valida. Intenta de nuevo.')
         this.gameStatus.set('idle')
         return
       }
-      //activo partida y timer
+
+      //inicio juego y timer
       this.gameStatus.set('playing')
       this.sessionRunning = true
       this.startTimer()
     } catch (error) {
-      //error al cargar palabra
+      //error de carga de palabra
       this.loadError.set('No se pudo cargar una palabra. Prueba de nuevo mas tarde.')
       if (startingNewSession) {
         this.sessionRunning = false
       }
     } finally {
-      //quito loading
+      //fin de carga
       this.loading.set(false)
     }
   }
 
   //====================================================================
 
-  //manejo de letra elegida
+  //click de letra del teclado
   onLetterSelected(letter: string) {
-    //si no esta jugando salgo
-    if (this.gameStatus() !== 'playing') {
-      return
-    }
-    //si la letra ya se uso salgo
-    if (this.usedLetters().includes(letter)) {
-      return
-    }
-    //agrego letra al historial
+    if (this.gameStatus() !== 'playing') return
+    if (this.usedLetters().includes(letter)) return
+
+    //agrego letra a usadas
     const nextLetters = [...this.usedLetters(), letter]
     this.usedLetters.set(nextLetters)
-    //normalizo letra para comparar
+
+    //normalizo letra y usadas
     const normalizedLetter = this.normalizeLetter(letter)
-    //conjunto normalizado de usadas
-    const normalizedUsed = nextLetters.map((item) => this.normalizeLetter(item))
-    //si pertenece a la palabra verifico victoria
+    const normalizedUsed = nextLetters.map(item => this.normalizeLetter(item))
+
+    //si la letra esta en objetivo verifico si ya se completo todo
     if (this.targetLetters().includes(normalizedLetter)) {
       const allTargets = this.targetLetters()
-      //todas las letras objetivo ya usadas
-      const allGuessed = allTargets.every((target) => normalizedUsed.includes(target))
+      const allGuessed = allTargets.every(target => normalizedUsed.includes(target))
       if (allGuessed) {
         this.completeRound()
       }
     } else {
-      //no pertenece sumo error
-      this.wrongAttempts.update((value) => value + 1)
-      //si llego al maximo termina por vidas
+      //sino sumo error y valido fin por vidas
+      this.wrongAttempts.update(value => value + 1)
       if (this.wrongAttempts() >= this.maxFails) {
         void this.finishSession('lives')
       }
@@ -336,9 +336,8 @@ export class Ahorcado implements OnInit, OnDestroy {
 
   //====================================================================
 
-  //reinicio de estado de sesion
+  //resetea toda la sesion a estado inicial
   private resetSessionState() {
-    //limpio contadores y estados
     this.stopTimer()
     this.wrongAttempts.set(0)
     this.completedWords.set(0)
@@ -349,6 +348,7 @@ export class Ahorcado implements OnInit, OnDestroy {
     this.englishWord.set('')
     this.spanishWord.set('')
     this.hint.set('')
+    this.lastSolvedWord.set('')
     this.sessionRunning = false
     this.gameStatus.set('idle')
     this.usedWordsSet.clear()
@@ -356,103 +356,83 @@ export class Ahorcado implements OnInit, OnDestroy {
 
   //====================================================================
 
-  //completa una ronda
+  //marca ronda completa y prepara nueva palabra
   private completeRound() {
-    //evito cambios si no esta jugando
-    if (this.gameStatus() !== 'playing') {
-      return
-    }
-    //sumo acierto
-    this.completedWords.update((value) => value + 1)
-    //muestro modal de ronda ganada
-    this.gameStatus.set('roundWon')
+    if (this.gameStatus() !== 'playing') return
+    //guardo ultima palabra resuelta para mostrar debajo de categoria y pista
+    this.lastSolvedWord.set(this.spanishWord())
+    this.completedWords.update(value => value + 1)
+    void this.startNewGame()
   }
 
   //====================================================================
 
-  //finaliza sesion por vidas o tiempo
+  //finaliza la sesion por vidas o por tiempo y guarda en base
   private async finishSession(reason: 'lives' | 'time') {
-    //si ya termino no repito acciones
     if (this.gameStatus() === 'sessionOutOfLives' || this.gameStatus() === 'sessionTimeUp') {
       return
     }
-    //actualizo estado segun motivo
     this.gameStatus.set(reason === 'lives' ? 'sessionOutOfLives' : 'sessionTimeUp')
-    //detengo timer y cierro sesion
     this.stopTimer()
     this.sessionRunning = false
-    //guardo resultados
     await this.saveSession(reason)
   }
 
   //====================================================================
 
-  //prepara palabra traducida y normalizada
+  //prepara estructuras de la palabra en espanol
   private prepareSpanishWord(word: string) {
-    //paso a mayus y recorto espacios
     const upper = word.toUpperCase().trim()
-    //guardo palabra para mostrar
     this.spanishWord.set(upper)
-    //lista normalizada por caracter
-    const normalized = upper.split('').map((char) => this.normalizeLetter(char))
+
+    //normalizo cada caracter
+    const normalized = upper.split('').map(char => this.normalizeLetter(char))
     this.normalizedLetters.set(normalized)
-    //letras validas sin repetir
-    const validLetters = normalized.filter((char, index) => {
+
+    //filtra solo letras del alfabeto manteniendo posiciones
+    const validLetters = normalized.filter((_, index) => {
       const isLetter = this.isAlphabetChar(upper[index] ?? '')
       return isLetter
     })
-    const unique = Array.from(new Set(validLetters)).filter((char) => char !== '')
+    //saco repetidas y vacios
+    const unique = Array.from(new Set(validLetters)).filter(char => char !== '')
     this.targetLetters.set(unique)
   }
 
   //====================================================================
 
-  //normaliza un caracter
+  //normaliza letra quitando acentos y simbolos excepto ñ
   private normalizeLetter(char: string) {
-    //caso especial para la letra n con tilde
-    if (char === 'Ñ') {
-      return 'Ñ'
-    }
-    //elimino tildes y simbolos y paso a mayus
+    if (char === 'Ñ') return 'Ñ'
     const base = char
       .normalize('NFD')
       .replace(/[^\w\s]|_/g, '')
       .replace(/[\u0300-\u036f]/g, '')
       .toUpperCase()
-    //tomo primer caracter
     return base.charAt(0)
   }
 
   //====================================================================
 
-  //verifica si es letra del alfabeto
+  //verifica si es una letra del alfabeto o ñ
   private isAlphabetChar(char: string) {
-    //acepto a a z y la letra n con tilde
     const normalized = this.normalizeLetter(char)
     return /^[A-Z]$/.test(normalized) || normalized === 'Ñ'
   }
 
   //====================================================================
 
-  //inicia timer del juego
+  //inicia timer acumulando tiempo previo si existia
   private startTimer() {
-    //si ya corre no hago nada
-    if (this.timerRef) {
-      return
-    }
-    //configuro inicio con desfase si corresponde
+    if (this.timerRef) return
     if (!this.sessionStartTimestamp) {
       this.sessionStartTimestamp = Date.now() - this.elapsedSeconds() * 1000
     }
-    //tick cada segundo
     this.timerRef = setInterval(() => {
-      if (!this.sessionStartTimestamp) {
-        return
-      }
+      if (!this.sessionStartTimestamp) return
       const seconds = Math.floor((Date.now() - this.sessionStartTimestamp) / 1000)
       const safeSeconds = Math.min(seconds, this.maxTimeSeconds)
       this.elapsedSeconds.set(safeSeconds)
-      //si se agota el tiempo finalizo
       if (safeSeconds >= this.maxTimeSeconds) {
         void this.finishSession('time')
       }
@@ -461,9 +441,8 @@ export class Ahorcado implements OnInit, OnDestroy {
 
   //====================================================================
 
-  //detiene el timer
+  //detiene timer y limpia referencia
   private stopTimer() {
-    //limpio intervalo si existe
     if (this.timerRef) {
       clearInterval(this.timerRef)
       this.timerRef = null
@@ -473,17 +452,14 @@ export class Ahorcado implements OnInit, OnDestroy {
 
   //====================================================================
 
-  //guarda resultados de sesion en supabase
-  private async saveSession(reason: 'lives' | 'time') {
-    //busco usuario actual
+  //guarda la sesion en supabase
+  private async saveSession(_reason: 'lives' | 'time') {
     const user = this.auth.getCurrentUser()
-    //si no hay usuario salgo
     if (!user?.id) {
       console.log('no se guardo la partida porque no hay usuario logueado')
       return
     }
     try {
-      //inserto datos en tabla
       await this.supabase.client.from('ahorcado_partidas').insert({
         user_id: user.id,
         usuario: user.nombre ?? user.email ?? 'Sin nombre',

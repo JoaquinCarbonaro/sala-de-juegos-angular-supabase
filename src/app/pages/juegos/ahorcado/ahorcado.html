@@ -1,179 +1,143 @@
 <section class="hangman">
 
-  <!--encabezado y controles-->
+  <!--encabezado principal-->
   <header class="hangman__header">
     <h1>Juego del Ahorcado</h1>
     <p>
-      Selecciona una categoria y adivina la palabra en español antes de quedarte sin vidas
+      Adiviná la mayor cantidad de palabras antes de quedarte sin vidas o sin tiempo. Elegí la categoría que más te guste y usá el
+      teclado virtual para probar letras hasta adivinar la palabra oculta.
     </p>
-
-    <!--controles principales-->
-    <div class="hangman__controls">
-
-      <!--label del select-->
-      <label class="hangman__label" for="category-select">Categoria</label>
-      <!--selector de categorias-->
-      <select
-        id="category-select"
-        class="hangman__select"
-        (change)="onCategoryChange($event)"
-        [disabled]="loading() || categories().length === 0"
-      >
-        @for (option of categories(); track option) {
-          <option [value]="option" [selected]="option === selectedCategory()">
-            {{ categoryLabels[option] || option }}
-          </option>
-        }
-      </select>
-      <!--boton nueva palabra-->
-      <button
-        class="hangman__reload"
-        (click)="startNewGame()"
-        [disabled]="loading() || categories().length === 0"
-      >
-        @if (loading()) {
-          <span>Cargando...</span>
-        } @else {
-          <span>Nueva palabra</span>
-        }
-      </button>
-    </div>
   </header>
 
-  <!--mensaje de error-->
-  @if (loadError()) {
-    <div class="hangman__error">
-      <p>{{ loadError() }}</p>
-      <button class="hangman__reload" (click)="retryLoad()">Reintentar</button>
+  <!--pantalla inicial-->
+  @if (!hasSessionStarted()) {
+    <div class="hangman__start hangman__card">
+      <p>Tenés seis vidas y tres minutos para sumar la mayor cantidad de aciertos posibles.</p>
+
+      @if (loadError()) {
+        <div class="hangman__error">
+          <p>{{ loadError() }}</p>
+          <button class="hangman__button" (click)="retryLoad()">Reintentar</button>
+        </div>
+      }
+
+      <button class="hangman__button" (click)="startSession()" [disabled]="loading() || categories().length === 0">
+        @if (loading()) { <span>Preparando partida...</span> } @else { <span>Comenzar partida</span> }
+      </button>
     </div>
-  }
 
-  <!--zona principal del juego-->
-  @if (!loadError()) {
-    <div class="hangman__body">
+  <!--pantalla de juego-->
+  } @else if (gameStatus() === 'playing' || gameStatus() === 'idle') {
 
-      <!--panel reutilizable de datos (match-panel)-->
+    @if (loadError()) {
+      <div class="hangman__error hangman__card">
+        <p>{{ loadError() }}</p>
+        <button class="hangman__button" (click)="retryLoad()">Reintentar</button>
+      </div>
+    }
+
+    <!--panel con datos de la partida-->
+    <div class="hangman__panel hangman__card">
       <app-match-panel
         [time]="remainingTime()"
         [totalTime]="maxTimeSeconds"
         [remainingLives]="remainingAttempts()"
         [totalLives]="maxFails"
-        [hits]="completedWords()"
-      ></app-match-panel>
+        [hits]="completedWords()">
+      </app-match-panel>
+    </div>
+
+    <!--barra de controles-->
+    <div class="hangman__toolbar hangman__card">
+      <div class="hangman__toolbar-group">
+        <label class="hangman__label" for="category-select">Categoría</label>
+        <select id="category-select" class="hangman__select"
+          (change)="onCategoryChange($event)"
+          [disabled]="loading() || categories().length === 0">
+          @for (option of categories(); track option) {
+            <option [value]="option" [selected]="option === selectedCategory()">
+              {{ categoryLabels[option] || option }}
+            </option>
+          }
+        </select>
+      </div>
+
+      <button class="hangman__button" (click)="startNewGame()"
+        [disabled]="loading() || categories().length === 0">
+        @if (loading()) { <span>Cargando palabra...</span> } @else { <span>Nueva palabra</span> }
+      </button>
+    </div>
+
+    <!--zona principal del juego-->
+    <div class="hangman__game">
 
       <!--bloque con dibujo y palabra-->
-      <div class="hangman__play">
-        <!--dibujo del ahorcado-->
+      <div class="hangman__play hangman__card">
         <div class="hangman__figure">
           <img [src]="hangmanImage()" alt="Dibujo del ahorcado" />
         </div>
-        
-        <!--contenedor de la palabra-->
+
         <div class="hangman__word">
-          <!--linea que muestra la palabra enmascarada-->
           <p class="word-line">
-            <!--recorro cada palabra enmascarada-->
             @for (w of maskedWords(); track $index) {
-              <!--palabra enmascarada completa-->
               <span class="word-pill">{{ w }}</span>
-              <!--gap visual entre palabras-->
               @if ($index < maskedWords().length - 1) { <span class="word-gap"></span> }
             }
           </p>
         </div>
-        
-    </div>
+      </div>
 
       <!--teclado de letras-->
-      <div class="hangman__keyboard">
+      <div class="hangman__keyboard hangman__card">
         @for (row of keyboardRows; track $index) {
-          <div class="keyboard-row">
+          <div class="keyboard-row"
+               [class.keyboard-row--offset]="$index===1"
+               [class.keyboard-row--offset-2]="$index===2">
             @for (letter of row; track letter) {
-              <!--boton de letra-->
-              <button
-                class="keyboard-key"
+              <button class="keyboard-key"
                 (click)="onLetterSelected(letter)"
-                [disabled]="
-                  loading() ||
-                  gameStatus() !== 'playing' ||
-                  usedLetters().includes(letter)
-                "
-              >
+                [disabled]="loading() || usedLetters().includes(letter) || gameStatus() !== 'playing'">
                 {{ letter }}
               </button>
             }
           </div>
         }
       </div>
+    </div>
 
-      <!--datos extra de categoria y pista-->
-      <section class="hangman__info">
-        <p>
-          <strong>Categoria:</strong>
-          {{ categoryLabels[category()] || category() || 'Sin categoria' }}
-          @if (hint()) {
-            <p><strong>Pista:</strong> {{ hint() }}</p>
-          }
+    <!--datos extra de categoria, pista y feedback de palabra anterior-->
+    <section class="hangman__info hangman__card">
+      <p><strong>Categoría:</strong> {{ categoryLabels[category()] || category() || 'Sin categoría' }}</p>
+      @if (hint()) { <p><strong>Pista:</strong> {{ hint() }}</p> }
+
+      @if (lastSolvedWord()) {
+        <p class="hangman__feedback">¡Acertaste la palabra anterior!</p>
+        <p class="hangman__feedback hangman__feedback--detail">
+          La palabra era: {{ lastSolvedWord() }}
         </p>
-      </section>
+      }
+    </section>
+
+  <!--pantalla final-->
+  } @else {
+    <div class="hangman__summary hangman__card">
+      <h2>Fin de la partida</h2>
+      @if (gameStatus() === 'sessionOutOfLives') { <p>Te quedaste sin vidas disponibles.</p> }
+      @else { <p>Se agotó el tiempo de la sesión.</p> }
+
+      <ul>
+        <li>Aciertos: {{ completedWords() }}</li>
+        <li>Vidas restantes: {{ remainingAttempts() }}</li>
+        <li>Tiempo jugado: {{ elapsedSeconds() }} segundos</li>
+      </ul>
+
+      <div class="hangman__summary-actions">
+        <button class="hangman__button" (click)="startNewGame()" [disabled]="loading()">
+          @if (loading()) { <span>Cargando palabra...</span> } @else { <span>Jugar de nuevo</span> }
+        </button>
+        <a class="hangman__link" routerLink="/juegos">Volver a la sala</a>
+      </div>
     </div>
   }
-
-  <!--modal cuando se gana una ronda-->
-  @if (gameStatus() === 'roundWon') {
-    <div class="hangman__modal">
-      <div class="hangman__modal-content hangman__modal-content--won">
-        <div class="hangman__modal-icon">🎉</div>
-        <h2 class="hangman__modal-title">Palabra adivinada</h2>
-        <p class="hangman__modal-description">
-          Llevas {{ completedWords() }} aciertos en esta sesion
-        </p>
-        <div class="hangman__modal-actions">
-          <button class="hangman__reload hangman__modal-button" (click)="startNewGame()">
-            Siguiente palabra
-          </button>
-        </div>
-      </div>
-    </div>
-
-  } @else if (gameStatus() === 'sessionOutOfLives') {
-  <!--modal sin vidas-->
-  <div class="hangman__modal">
-    <div class="hangman__modal-content hangman__modal-content--lost">
-      <div class="hangman__modal-icon">💀</div>
-      <h2 class="hangman__modal-title">Fin de la sesión</h2>
-      <p class="hangman__modal-description">
-        Te quedaste sin vidas. Adivinaste {{ completedWords() }} palabra(s).
-      </p>
-      <!--muestra la solucion-->
-      <p class="hangman__modal-description">La palabra era: <strong>{{ spanishWord() }}</strong></p>
-      <div class="hangman__modal-actions">
-        <button class="hangman__reload hangman__modal-button" (click)="startNewGame()">
-          Iniciar nueva partida
-        </button>
-      </div>
-    </div>
-  </div>
-
-  } @else if (gameStatus() === 'sessionTimeUp') {
-  <!--modal tiempo agotado-->
-  <div class="hangman__modal">
-    <div class="hangman__modal-content hangman__modal-content--lost">
-      <div class="hangman__modal-icon">⏰</div>
-      <h2 class="hangman__modal-title">Tiempo agotado</h2>
-      <p class="hangman__modal-description">
-        Se terminó el tiempo disponible. Adivinaste {{ completedWords() }} palabra(s).
-      </p>
-      <!--muestra la solucion-->
-      <p class="hangman__modal-description">La palabra era: <strong>{{ spanishWord() }}</strong></p>
-      <div class="hangman__modal-actions">
-        <button class="hangman__reload hangman__modal-button" (click)="startNewGame()">
-          Iniciar nueva partida
-        </button>
-      </div>
-    </div>
-  </div>
-}
-
 
 </section>

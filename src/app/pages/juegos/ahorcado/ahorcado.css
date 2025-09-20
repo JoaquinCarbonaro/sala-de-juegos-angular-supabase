@@ -2,287 +2,328 @@
 .hangman {
   max-width: 960px;
   margin: 0 auto;
-  padding: 24px;
+  padding: 2rem 1.5rem 4rem;
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 1.5rem;
+  color: #f8f9fa;
+  background: linear-gradient(180deg, rgba(20, 24, 45, 0.9), rgba(14, 16, 30, 0.95));
+  border-radius: 20px;
+  box-shadow: 0 30px 80px rgba(8, 10, 20, 0.6);
 }
 
-/*encabezado del juego*/
+/*encabezado*/
 .hangman__header {
+  text-align: center;
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  align-items: flex-start;
+  gap: 0.75rem;
 }
 
-/*boton de reinicio*/
-.hangman__reload {
-  padding: 8px 16px;
+/*texto secundario*/
+.hangman__header p {
+  color: #cfd4ff;
+  margin: 0;
+}
+
+/*tarjeta reutilizable*/
+.hangman__card {
+  background: rgba(33, 37, 68, 0.55);
+  padding: 2rem;
+  border-radius: 18px;
+  border: 1px solid rgba(111, 66, 193, 0.4);
+  box-shadow: inset 0 0 20px rgba(3, 4, 12, 0.6);
+}
+
+/*pantalla de inicio*/
+.hangman__start {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/*boton principal*/
+.hangman__button {
+  background: linear-gradient(135deg, #6f42c1, #d63384);
   border: none;
-  border-radius: 8px;
-  background-color: #3f51b5;
-  color: #ffffff;
+  color: #fff;
   font-weight: 600;
+  padding: 0.85rem 2.5rem;
+  border-radius: 999px;
   cursor: pointer;
-  transition: transform 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
-  box-shadow: 0 10px 20px rgba(63, 81, 181, 0.35);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 12px 30px rgba(214, 51, 132, 0.35);
 }
 
-/*estado deshabilitado del boton*/
-.hangman__reload:disabled {
-  background-color: #9da7d1;
+/*hover del boton*/
+.hangman__button:hover:enabled {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 18px 40px rgba(214, 51, 132, 0.45);
+}
+
+/*boton deshabilitado*/
+.hangman__button:disabled {
+  opacity: 0.6;
   cursor: not-allowed;
-  transform: none;
   box-shadow: none;
 }
 
-/*hover del boton activo*/
-.hangman__reload:not(:disabled):hover {
-  transform: translateY(-2px);
-  background-color: #2f3fa0;
-  box-shadow: 0 14px 24px rgba(63, 81, 181, 0.45);
-}
-
-/*mensaje de error*/
+/*error reutilizable*/
 .hangman__error {
-  padding: 16px;
-  border-radius: 12px;
-  background-color: #ffe0e0;
-  color: #5c1d1d;
+  background: rgba(109, 27, 27, 0.4);
+  border: 1px solid rgba(229, 57, 53, 0.5);
+  border-radius: 16px;
+  padding: 1rem 1.25rem;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 0.75rem;
+  align-items: center;
+  text-align: center;
+  color: #ffeaea;
 }
 
-/*cuerpo del juego*/
-.hangman__body {
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
+/*panel de datos*/
+.hangman__panel {
+  padding: 1.5rem 1.25rem;
 }
 
-/*controles principales*/
-.hangman__controls {
+/*barra de controles centrada*/
+.hangman__toolbar {
   display: flex;
   flex-wrap: wrap;
-  gap: 12px;
   align-items: center;
+  justify-content: center;
+  gap: 1rem;
 }
 
-/*label del select*/
+/*grupo de controles (label+select)*/
+.hangman__toolbar-group {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/*label*/
 .hangman__label {
   font-weight: 600;
+  color: #ffd86b;
 }
 
-/*select de categorias*/
+/*select*/
 .hangman__select {
-  padding: 8px 12px;
-  border-radius: 8px;
-  border: 2px solid #3f51b5;
-  background-color: #ffffff;
+  padding: 0.65rem 1rem;
+  border-radius: 12px;
+  border: 2px solid rgba(207, 212, 255, 0.6);
+  background: rgba(10, 12, 26, 0.7);
+  color: #f8f9fa;
   font-weight: 600;
   min-width: 160px;
 }
 
-/*bloque principal de juego*/
+/*zona del juego - SIEMPRE columna (figura+palabra arriba, teclado abajo)*/
+.hangman__game {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/*bloque de juego*/
 .hangman__play {
   display: flex;
   flex-direction: column;
-  gap: 16px;
   align-items: center;
+  gap: 1.5rem;
 }
 
-/*contenedor del dibujo*/
+/*contenedor de figura*/
 .hangman__figure {
-  background-color: #ffffff;
-  padding: 16px;
-  border-radius: 12px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  background: rgba(10, 12, 26, 0.7);
+  padding: 1.5rem;
+  border-radius: 18px;
+  border: 1px solid rgba(111, 66, 193, 0.4);
+  box-shadow: inset 0 0 18px rgba(3, 4, 12, 0.75);
 }
 
-/*imagen del ahorcado*/
+/*imagen (tope adaptable para que no empuje al teclado)*/
 .hangman__figure img {
-  width: 240px;
+  width: min(220px, 70vw);
+  max-width: 100%;
   height: auto;
   object-fit: contain;
 }
 
-/*texto de la palabra*/
+/*palabra mostrada*/
 .hangman__word {
-  padding: 24px;
-  border-radius: 12px;
-  background-color: #1a1a2e;
-  color: #ffffff;
-  font-size: 28px;
-  letter-spacing: 8px;
-  text-align: center;
-  font-weight: 700;
   width: 100%;
-  max-width: 520px;
+  background: rgba(10, 12, 26, 0.7);
+  border-radius: 18px;
+  border: 1px solid rgba(111, 66, 193, 0.4);
+  padding: 1.5rem;
+  text-align: center;
+  font-size: 1.75rem;
+  letter-spacing: 0.5rem;
+  font-weight: 700;
+  box-shadow: inset 0 0 18px rgba(3, 4, 12, 0.75);
 }
 
-/*datos extra*/
-.hangman__info {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-/*teclado completo*/
+/*teclado*/
 .hangman__keyboard {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 1rem;
+  width: 100%;
 }
 
-/*fila del teclado*/
+/*fila del teclado centrada*/
 .keyboard-row {
   display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
   justify-content: center;
+  gap: clamp(6px, 1.8vw, 12px);
+  flex-wrap: nowrap;
 }
 
-/*tecla individual*/
+/*desfase visual tipo teclado fisico*/
+.keyboard-row--offset { padding-left: 26px; }
+.keyboard-row--offset-2 { padding-left: 52px; }
+
+/*tecla individual adaptable*/
 .keyboard-key {
-  width: 48px;
-  height: 48px;
-  border: none;
-  border-radius: 8px;
-  background-color: #e0e3ff;
-  color: #1a1a2e;
+  width: clamp(36px, 8.5vw, 52px);
+  height: clamp(36px, 8.5vw, 52px);
+  border-radius: 12px;
+  border: 1px solid rgba(207, 212, 255, 0.4);
+  background: rgba(207, 212, 255, 0.15);
+  color: #f8f9fa;
   font-weight: 700;
+  font-size: clamp(14px, 3.2vw, 18px);
   cursor: pointer;
-  transition: transform 0.2s ease, background-color 0.2s ease;
+  transition: transform 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 10px 20px rgba(15, 18, 40, 0.35);
+}
+
+/*tecla hover*/
+.keyboard-key:hover:not(:disabled) {
+  transform: translateY(-2px);
+  background: rgba(207, 212, 255, 0.3);
 }
 
 /*tecla deshabilitada*/
 .keyboard-key:disabled {
-  background-color: #bfc4e6;
-  color: #5f5f7a;
+  opacity: 0.45;
   cursor: not-allowed;
-  transform: none;
+  box-shadow: none;
 }
 
-/*hover de la tecla*/
-.keyboard-key:not(:disabled):hover {
-  transform: translateY(-2px);
-  background-color: #c9ceff;
-}
-
-/*modal general*/
-.hangman__modal {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(10, 13, 35, 0.65);
+/*info extra*/
+.hangman__info {
   display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 16px;
-  z-index: 30;
-  backdrop-filter: blur(4px);
+  flex-direction: column;
+  gap: 0.5rem;
+  color: #e5e9ff;
 }
 
-/*contenido base del modal*/
-.hangman__modal-content {
-  padding: 32px 28px;
-  border-radius: 22px;
-  width: min(420px, 100%);
+/*feedback al estilo mayor-menor*/
+.hangman__feedback {
+  text-align: center;
+  color: #ffd86b;
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+.hangman__feedback--detail {
+  text-align: center;
+  color: #e5e9ff;
+  font-size: 0.95rem;
+  font-weight: 500;
+  opacity: 0.9;
+}
+
+/*resumen final*/
+.hangman__summary {
   text-align: center;
   display: flex;
   flex-direction: column;
-  gap: 18px;
-  color: #f5f7ff;
-  box-shadow: 0 22px 44px rgba(9, 12, 34, 0.55);
-  border: 1px solid rgba(255, 255, 255, 0.18);
+  gap: 1.25rem;
 }
 
-/*modal ganador*/
-.hangman__modal-content--won {
-  background: linear-gradient(155deg, #1b5e20, #4caf50);
-}
-
-/*modal perdedor*/
-.hangman__modal-content--lost {
-  background: linear-gradient(155deg, #6d1b1b, #e53935);
-}
-
-/*icono grande*/
-.hangman__modal-icon {
-  font-size: 2.4rem;
-}
-
-/*titulo modal*/
-.hangman__modal-title {
-  font-size: 2.2rem;
+/*lista del resumen*/
+.hangman__summary ul {
+  list-style: none;
   margin: 0;
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-}
-
-/*descripcion*/
-.hangman__modal-description {
-  margin: 0;
-  font-size: 1.1rem;
-  line-height: 1.6;
-}
-
-/*contenedor botones*/
-.hangman__modal-actions {
+  padding: 0;
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  gap: 0.5rem;
+  color: #e5e9ff;
 }
 
-/*boton dentro del modal*/
-.hangman__modal-button {
-  min-width: 180px;
-  font-size: 1rem;
-  box-shadow: 0 10px 18px rgba(0, 0, 0, 0.25);
+/*acciones del resumen*/
+.hangman__summary-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+}
+
+/*enlace estilo boton*/
+.hangman__link {
+  display: inline-block;
+  padding: 0.85rem 2.5rem;
+  border-radius: 999px;
+  color: #ffd86b;
+  font-weight: 600;
+  text-decoration: none;
+  border: 2px solid #ffd86b;
+  transition: all 0.2s ease;
+}
+
+/*hover enlace*/
+.hangman__link:hover {
+  background: rgba(255, 216, 107, 0.1);
 }
 
 /*linea que contiene todas las palabras*/
-.word-line{white-space: normal;}
-/*cada palabra no se corta y tiene espaciado entre letras*/
-.word-pill{white-space: nowrap; letter-spacing:8px;}
-/*espacio fijo entre palabras*/
-.word-gap{display:inline-block; width:16px;}
+.word-line { white-space: normal; }
 
-/*responsive en pantallas chicas*/
-@media (max-width: 767px) {
-  /*achico padding*/
-  .hangman {
-    padding: 16px;
+/*cada palabra no se corta y tiene espaciado entre letras*/
+.word-pill { white-space: nowrap; letter-spacing: 0.5rem; }
+
+/*espacio fijo entre palabras*/
+.word-gap { display: inline-block; width: 16px; }
+
+/*responsivo general*/
+@media (min-width: 992px){
+  .keyboard-key { width: clamp(40px, 5.5vw, 52px); height: clamp(40px, 5.5vw, 52px); }
+}
+
+/*<= 768px: achico el espaciado de la palabra para que entre mejor*/
+@media (max-width: 768px) {
+  .hangman { padding: 1.5rem 1rem 3rem; }
+  .hangman__card { padding: 1.5rem; }
+  .hangman__word { font-size: 1.4rem; letter-spacing: 0.35rem; }
+  .hangman__toolbar { gap: 0.75rem; }
+  .hangman__toolbar-group { width: 100%; justify-content: center; }
+}
+
+/*<= 600px: permito wrap de filas y quito offsets para compactar*/
+@media (max-width: 600px){
+  .keyboard-row{
+    flex-wrap: wrap;   /*las teclas pueden bajar a otra linea*/
+    gap: 10px;
   }
-  /*achico imagen*/
-  .hangman__figure img {
-    width: 200px;
-  }
-  /*achico texto palabra*/
-  .hangman__word {
-    font-size: 22px;
-    letter-spacing: 6px;
-  }
-  /*achico teclas*/
-  .keyboard-key {
-    width: 44px;
-    height: 44px;
+  .keyboard-row--offset,
+  .keyboard-row--offset-2{
+    padding-left: 0;   /*sin offsets en pantallas chicas*/
   }
 }
 
-/*responsive en pantallas grandes*/
-@media (min-width: 992px) {
-  /*centro header*/
-  .hangman__header {
-    align-items: center;
-    text-align: center;
-  }
-  /*responsive se expande desde 992px*/
-  .hangman__controls {
-    justify-content: center;
+/*<= 360px: compactacion extra para pantallas muy chicas*/
+@media (max-width: 360px){
+  .keyboard-row{ gap: 8px; }
+  .keyboard-key{
+    width: clamp(32px, 10vw, 40px);
+    height: clamp(32px, 10vw, 40px);
+    font-size: clamp(12px, 3.6vw, 14px);
   }
 }
