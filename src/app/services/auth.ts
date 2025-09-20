@@ -47,13 +47,19 @@ export class Auth {
     const userId = respuesta.data.user?.id ?? null
     const perfil = await this.sb.client
       .from('usuarios')
-      .select('nombre')
+      .select('nombre, created_at')
       .eq('id', userId)
-      .single()
+      .single<{ nombre: string | null; created_at: string | null }>()
 
     //guardo usuario en memoria con id, email y nombre si existe
     const nombre = perfil.data?.nombre ?? null
-    this.currentUserSubject.next({ id: userId ?? undefined, email, nombre } as Usuario)
+    const createdAt = perfil.data?.created_at ?? respuesta.data.user?.created_at ?? null
+    this.currentUserSubject.next({
+      id: userId ?? undefined,
+      email,
+      nombre,
+      createdAt: createdAt ?? undefined,
+    } as Usuario)
 
     return { data: respuesta.data }
   }
@@ -80,7 +86,13 @@ export class Auth {
 
     //actualizo estado con id email y nombre
     const id = respuesta.data.user?.id ?? null
-    this.currentUserSubject.next({ id: id ?? undefined, email: userData.email, nombre: userData.nombre } as Usuario)
+    const createdAt = respuesta.data.user?.created_at ?? null
+    this.currentUserSubject.next({
+      id: id ?? undefined,
+      email: userData.email,
+      nombre: userData.nombre,
+      createdAt: createdAt ?? undefined,
+    } as Usuario)
 
     return { data: respuesta.data }
   }
@@ -148,23 +160,37 @@ export class Auth {
       //traigo nombre desde tabla usuarios usando uuid de auth
       const { data, error } = await this.sb.client
         .from('usuarios')
-        .select('nombre')
+        .select('nombre, created_at')
         .eq('id', session.user.id)
-        .single()
+        .single<{ nombre: string | null; created_at: string | null }>()
 
       //si falla me quedo con id y email
       if (error) {
-        this.currentUserSubject.next({ id: session.user.id, email: session.user.email } as Usuario)
+        this.currentUserSubject.next({
+          id: session.user.id,
+          email: session.user.email,
+          createdAt: session.user.created_at ?? undefined,
+        } as Usuario)
         return
       }
 
       //si ok guardo id, email y nombre
       const nombre = data?.nombre ?? null
-      this.currentUserSubject.next({ id: session.user.id, email: session.user.email, nombre } as Usuario)
+      const createdAt = data?.created_at ?? session.user.created_at ?? null
+      this.currentUserSubject.next({
+        id: session.user.id,
+        email: session.user.email,
+        nombre,
+        createdAt: createdAt ?? undefined,
+      } as Usuario)
 
     } catch {
       //si rompe me quedo con id y email
-      this.currentUserSubject.next({ id: session.user.id, email: session.user.email } as Usuario)
+      this.currentUserSubject.next({
+        id: session.user.id,
+        email: session.user.email,
+        createdAt: session.user.created_at ?? undefined,
+      } as Usuario)
     }
   }
 

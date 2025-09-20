@@ -5,6 +5,6 @@ export class Usuario {
     public nombre?: string,
     public apellido?: string,
     public edad?: number,
-    public fechaRegistro?: Date,
+    public createdAt?: string, //fecha de creación provista por Supabase (timestamp ISO)
   ) {}
 }
