@@ -33,15 +33,11 @@ export class Chat implements OnInit, OnDestroy, AfterViewInit {
 
   ngOnInit(): void {
     //carga inicial de mensajes
-    void this.realtime.obtenerMensajes().then((data) => {
-      this.mensajes.set(data); //set inicial
-      this.scrollToBottom(); //bajo al final despues de cargar
-    });
+    void this.cargarMensajesIniciales();
 
     //suscripcion realtime
     this.realtime.suscribirse((nuevo) => {
-      this.mensajes.update((anterior) => [...anterior, nuevo]); //agrego nuevo
-      this.scrollToBottom(); //bajo al final cuando entra mensaje
+      this.integrarMensajes(nuevo); //agrego nuevo evitando duplicados
     });
   }
 
@@ -125,4 +121,58 @@ export class Chat implements OnInit, OnDestroy, AfterViewInit {
       el.scrollTop = el.scrollHeight;
     });
   }
+
+  //=========================================
+
+  private async cargarMensajesIniciales() {
+    //traigo lista de mensajes ya guardados
+    const data = await this.realtime.obtenerMensajes();
+    this.integrarMensajes(data);
+  }
+
+  //=========================================
+
+  private integrarMensajes(entrantes: Mensaje | Mensaje[]) {
+    //normalizo a array
+    const lista = Array.isArray(entrantes) ? entrantes : [entrantes]
+    if (!lista.length) return
+
+    let seActualizo = false
+
+    //actualizo lista de mensajes
+    this.mensajes.update((actuales) => {
+      const mapa = new Map(actuales.map((msj) => [msj.id, msj]))
+
+      for (const msj of lista) {
+        const previo = mapa.get(msj.id)
+
+        //si el mensaje no existe o cambio algun campo lo actualizo
+        if (
+          !previo ||
+          previo.mensaje !== msj.mensaje ||
+          previo.usuario !== msj.usuario ||
+          previo.created_at !== msj.created_at ||
+          previo.user_id !== msj.user_id
+        ) {
+          mapa.set(msj.id, msj)
+          seActualizo = true
+        }
+      }
+
+      if (!seActualizo) {
+        return actuales
+      }
+
+      //ordeno por fecha ascendente
+      return Array.from(mapa.values()).sort(
+        (a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+      )
+    })
+
+    //si se actualizo bajo scroll
+    if (seActualizo) {
+      this.scrollToBottom()
+    }
+  }
+  
 }
