@@ -1,70 +1,66 @@
-<div class="container mt-5 pt-5">
-  <div class="row justify-content-center">
-    <div class="col-lg-8">
+<section class="chat-full page-chat"> <!--ocupa el alto de la pantalla-->
+  <div class="container py-5"> <!--padding para no tapar navbar-->
+    <div class="row justify-content-center">
+      <div class="col-lg-8 chat-shell"> <!--columna que se estira-->
 
-      <!--titulo-->
-      <div class="text-center mb-4">
-        <h1 class="hero-title fw-bold text-primary mb-2">
-          <i class="bi bi-chat-dots me-2"></i>
-          Sala de Chat
-        </h1>
-        <p class="lead text-light">Conecta con otros jugadores en tiempo real</p>
-      </div>
-
-      <!--chat-->
-      <div class="chat-container">
-        <!--identidad-->
-        <div class="p-3 border-bottom border-opacity-25">
-          @if (usuarioActual()) {
-            <p class="mb-0">
-              Escribiendo como
-              <strong>{{ usuarioActual()?.nombre || usuarioActual()?.email }}</strong>
-            </p>
-          } @else {
-            <p class="mb-0 text-warning">Validando tu sesión...</p>
-          }
+        <!--titulo-->
+        <div class="text-center mb-4">
+          <h1 class="hero-title fw-bold text-primary mb-2">
+            <i class="bi bi-chat-dots me-2"></i>
+            Sala de Chat
+          </h1>
+          <p class="lead text-light">Conecta con otros jugadores en tiempo real</p>
         </div>
 
-        <!--lista de mensajes-->
-        <div class="chat-messages" #messagesScroll>
-        @for (msj of mensajes(); track msj.id) {
-            <!--si es propio le agrega la clase .own-->
-            <div class="message" [class.own]="esPropio(msj)">
-            <div class="message-header">
-                <!--nombre del autor-->
-                <span class="message-author">{{ msj.usuario }}</span>
-                <!--fecha-->
-                <span class="message-date">
-                    {{ msj.created_at | date:'dd/MM/yy, HH:mm' }}
-                </span>
-            </div>
-            <!--cuerpo del mensaje-->
-            <div class="message-body">
-                {{ msj.mensaje }}
-            </div>
-            </div>
-        }
-        </div>
-
-        <!--input-->
-        <form class="chat-input" (ngSubmit)="enviar()">
-          <div class="input-group">
-            <input
-              class="form-control"
-              [ngModel]="mensaje()"
-              (ngModelChange)="mensaje.set($event)"
-              name="mensaje"
-              placeholder="Escribe tu mensaje..."
-              required
-              minlength="1"
-            />
-            <button class="btn btn-primary" type="submit">
-              <i class="bi bi-send"></i>
-            </button>
+        <!--chat-->
+        <div class="chat-container shadow-lg">
+          <!--identidad-->
+          <div class="p-3 border-bottom border-opacity-25">
+            @if (usuarioActual()) {
+              <p class="mb-0">
+                Escribiendo como
+                <strong>{{ usuarioActual()?.nombre || usuarioActual()?.email }}</strong>
+              </p>
+            } @else {
+              <p class="mb-0 text-warning">Validando tu sesión...</p>
+            }
           </div>
-        </form>
-      </div>
 
+          <!--lista de mensajes-->
+          <div class="chat-messages" #messagesScroll>
+            @for (msj of mensajes(); track msj.id) {
+              <div class="message" [class.own]="esPropio(msj)">
+                <div class="message-header">
+                  <span class="message-author">{{ msj.usuario }}</span>
+                  <span class="message-date">{{ msj.created_at | date:'dd/MM/yy, HH:mm' }}</span>
+                </div>
+                <div class="message-body">
+                  {{ msj.mensaje }}
+                </div>
+              </div>
+            }
+          </div>
+
+          <!--input-->
+          <form class="chat-input" (ngSubmit)="enviar()">
+            <div class="input-group">
+              <input
+                class="form-control"
+                [ngModel]="mensaje()"
+                (ngModelChange)="mensaje.set($event)"
+                name="mensaje"
+                placeholder="Escribe tu mensaje..."
+                required
+                minlength="1"
+              />
+              <button class="btn btn-primary" type="submit">
+                <i class="bi bi-send"></i>
+              </button>
+            </div>
+          </form>
+        </div>
+
+      </div>
     </div>
   </div>
-</div>
+</section>

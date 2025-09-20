@@ -1,4 +1,25 @@
-/*tarjeta principal del formulario*/
+/*pantalla completa*/
+.auth-full{
+  min-height: 100vh; 
+  display: flex;
+  align-items: center; 
+}
+
+/*offset para navbar fijo*/
+.page-login{
+  padding-top: 3.5rem;
+  padding-bottom: 2rem;
+}
+
+/*contenedor principal de login*/
+.auth-card {
+  min-height: 520px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+/*estilo base de la tarjeta*/
 .card {
   border: none;
   border-radius: 15px;
@@ -6,14 +27,14 @@
   backdrop-filter: blur(10px);
 }
 
-/*campos del formulario*/
+/*campos de formulario*/
 .form-control {
   background: rgba(248, 249, 250, 0.1);
   border: 1px solid rgba(111, 66, 193, 0.3);
   color: var(--light-color);
 }
 
-/*cuando hago click en un campo*/
+/*efecto al enfocar campo*/
 .form-control:focus {
   background: rgba(248, 249, 250, 0.15);
   border-color: var(--primary-color);
@@ -21,37 +42,57 @@
   color: var(--light-color);
 }
 
-/*texto del placeholder*/
-.form-control::placeholder {
-  color: rgba(248, 249, 250, 0.6);
+/*placeholder del input*/
+.form-control::placeholder { 
+  color: rgba(248, 249, 250, 0.6); 
 }
 
 /*etiquetas de los campos*/
-.form-label {
-  color: var(--light-color);
-  font-weight: 500;
+.form-label { 
+  color: var(--light-color); 
+  font-weight: 500; 
 }
 
-/*boton del ojo*/
+/*boton del ojo de password*/
 .btn-outline-secondary {
-  border-color: rgba(111, 66, 193, 0.3);
+  border-color: rgba(111,66,193,0.3);
   color: var(--light-color);
 }
 
-/*hover en el boton del ojo*/
+/*hover del boton del ojo*/
 .btn-outline-secondary:hover {
   background-color: var(--primary-color);
   border-color: var(--primary-color);
 }
 
-/*que el botón del ojo quede pegado al input*/
+/*ojo integrado al input*/
 .input-group > .btn {
   border-top-left-radius: 0;
   border-bottom-left-radius: 0;
 }
 
-/*tamaño del icono del ojo*/
-.input-group .btn i {
-  font-size: 1.1rem;
-  line-height: 1;
+/*icono del ojo*/
+.input-group .btn i { 
+  font-size: 1.1rem; 
+  line-height: 1; 
+}
+
+/*tipografia un poco mas grande en formulario*/
+.auth-card .form-label,
+.auth-card .form-control,
+.auth-card button {
+  font-size: 1.05rem;
+}
+
+/*titulo del login*/
+.auth-card h2 { 
+  font-size: 2rem; 
+}
+
+/*responsive si el alto es chico reduzco paddings*/
+@media (max-height: 700px){
+  .page-login{ 
+    padding-top: 2rem; 
+    padding-bottom: 1rem; 
+  }
 }
