@@ -5,7 +5,7 @@ import { Supabase } from './supabase'
 import { Mensaje } from '../interface/mensaje'
 
 @Injectable({ providedIn: 'root' })
-export class RealtimeService {
+export class Realtime {
 
   private readonly supabase = inject(Supabase).client
   private canal: RealtimeChannel | null = null //canal actual o null

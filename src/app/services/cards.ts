@@ -13,7 +13,7 @@ export type CardData = {
 //====================================================================
 
 @Injectable({ providedIn: 'root' })
-export class CardsApi {
+export class Cards {
 
   private deckId: string | null = null //almacena el id del mazo activo
   private remaining = 0 //cartas restantes en el mazo

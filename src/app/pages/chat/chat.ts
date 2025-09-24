@@ -3,7 +3,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { DatePipe } from '@angular/common';
 import Swal from 'sweetalert2';
-import { RealtimeService } from '../../services/realtime';
+import { Realtime } from '../../services/realtime';
 import { Auth } from '../../services/auth';
 import { Mensaje } from '../../interface/mensaje';
 
@@ -16,7 +16,7 @@ import { Mensaje } from '../../interface/mensaje';
 })
 export class Chat implements OnInit, OnDestroy, AfterViewInit {
   //servicios
-  private readonly realtime = inject(RealtimeService);
+  private readonly realtime = inject(Realtime);
   private readonly auth = inject(Auth);
 
   //refs de vista

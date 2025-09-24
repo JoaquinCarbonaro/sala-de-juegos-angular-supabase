@@ -4,7 +4,7 @@ import { firstValueFrom } from 'rxjs'
 import { WordGameWord } from '../interface/word-game-word'
 
 @Injectable({ providedIn: 'root' })
-export class HangmanApi {
+export class Hangman {
 
   private readonly baseUrl = 'https://www.wordgamedb.com/api/v1' //url base de la api wordgamedb
   private readonly categoriesUrl = `${this.baseUrl}/categories` //endpoint de categorias

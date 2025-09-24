@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common'
 import { Component, OnDestroy, OnInit, computed, signal } from '@angular/core'
 import { RouterLink } from '@angular/router'
-import { HangmanApi } from '../../../services/hangman'
+import { Hangman } from '../../../services/hangman'
 import { Translation } from '../../../services/translation'
 import { Auth } from '../../../services/auth'
 import { Supabase } from '../../../services/supabase'
@@ -17,7 +17,7 @@ export class Ahorcado implements OnInit, OnDestroy {
 
   //servicios del juego
   constructor(
-    private readonly hangmanApi: HangmanApi,
+    private readonly hangmanApi: Hangman,
     private readonly translation: Translation,
     private readonly auth: Auth,
     private readonly supabase: Supabase,

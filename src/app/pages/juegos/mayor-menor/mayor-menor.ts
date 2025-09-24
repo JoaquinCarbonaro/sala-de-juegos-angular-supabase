@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common'
 import { Component, OnDestroy, computed, signal } from '@angular/core'
 import { RouterLink } from '@angular/router'
 import { MatchPanel } from '../../../components/match-panel/match-panel'
-import { CardsApi, CardData } from '../../../services/cards'
+import { Cards, CardData } from '../../../services/cards'
 import { Auth } from '../../../services/auth'
 import { Supabase } from '../../../services/supabase'
 import { Translation } from '../../../services/translation'
@@ -16,7 +16,7 @@ import { Translation } from '../../../services/translation'
 export class MayorMenor implements OnDestroy {
 
   constructor(
-    private readonly cardsApi: CardsApi,
+    private readonly cardsApi: Cards,
     private readonly auth: Auth,
     private readonly supabase: Supabase,
     private readonly translation: Translation,
