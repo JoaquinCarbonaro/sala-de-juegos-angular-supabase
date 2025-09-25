@@ -21,6 +21,23 @@
     </div>
     }
 
+    <!--selector de categoria en la pantalla inicial-->
+    <div class="hangman__control">
+      <label class="hangman__label" for="category-select-start">Categoría</label>
+      <select
+        id="category-select-start"
+        class="hangman__select"
+        (change)="onCategoryChange($event)"
+        [disabled]="loading() || categories().length === 0"
+      >
+        @for (option of categories(); track option) {
+          <option [value]="option" [selected]="option === selectedCategory()">
+            {{ categoryLabels[option] || option }}
+          </option>
+        }
+      </select>
+    </div>
+
     <button class="hangman__button" (click)="startSession()" [disabled]="loading() || categories().length === 0">
       @if (loading()) { <span>Preparando partida...</span> } @else { <span>Comenzar partida</span> }
     </button>
