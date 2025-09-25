@@ -130,12 +130,12 @@ html, body{
   color:#f8f9fa !important;
 }
 
-/*responsive: tablets y abajo*/
+/*pantallas medianas*/
 @media (max-width: 992px){
   .resultados-page > .container{ padding: 1.5rem 1rem; }
 }
 
-/*responsive: mobile chico*/
+/*pantallas chicas*/
 @media (max-width: 576px){
   .resultados-page{ padding: 3rem 0 5rem; }
   .results-card .card-header{ padding: .8rem 1rem; }

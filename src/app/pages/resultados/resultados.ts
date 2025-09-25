@@ -8,7 +8,6 @@ import {
   type ResultadoConPosicion,
 } from "../../services/ranking"
 
-//componente de resultados: muestra tablas por juego y ranking general
 @Component({
   selector: "app-resultados",
   standalone: true,
